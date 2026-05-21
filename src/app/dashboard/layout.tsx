@@ -12,6 +12,8 @@ import {
   Users,
   Settings,
   LogOut,
+  ClipboardList,
+  UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,12 +35,25 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     return null;
   }
 
+  const userRole = (session.user as any)?.role;
+  const isSuperAdmin = userRole === "SUPER_ADMIN";
+
   const navItems = [
     { href: "/dashboard", label: "Panel", icon: LayoutDashboard },
-    { href: "/dashboard/reports", label: "İhbarlar", icon: FileText },
+    { href: "/dashboard/reports", label: "Ihbarlar", icon: FileText },
+    { href: "/dashboard/form-builder", label: "Ihbar Formu", icon: ClipboardList },
     { href: "/dashboard/team", label: "Ekip", icon: Users },
     { href: "/dashboard/settings", label: "Ayarlar", icon: Settings },
   ];
+
+  // Super Admin only items
+  if (isSuperAdmin) {
+    navItems.push({
+      href: "/dashboard/users",
+      label: "Kullanicilar",
+      icon: UserPlus,
+    });
+  }
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -51,22 +66,37 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <p className="text-xs text-gray-500 mt-1">
             {(session.user as any)?.organizationName}
           </p>
+          {isSuperAdmin && (
+            <span className="inline-block mt-1 text-[10px] font-semibold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+              SUPER ADMIN
+            </span>
+          )}
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isSuperOnly = item.href === "/dashboard/users";
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-blue-50 text-blue-700"
+                    ? isSuperOnly
+                      ? "bg-purple-50 text-purple-700"
+                      : "bg-blue-50 text-blue-700"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
+                {isSuperOnly && (
+                  <span className="ml-auto text-[9px] bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded">
+                    SA
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -74,6 +104,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         <div className="p-3 border-t">
           <div className="px-3 py-2 text-sm text-gray-600 mb-2">
             {session.user?.name}
+            <span className="block text-xs text-gray-400">{session.user?.email}</span>
           </div>
           <Button
             variant="ghost"
@@ -81,7 +112,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             onClick={() => signOut({ callbackUrl: "/auth/login" })}
           >
             <LogOut className="h-4 w-4" />
-            Çıkış Yap
+            Cikis Yap
           </Button>
         </div>
       </aside>

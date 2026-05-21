@@ -1,0 +1,86 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { v4 as uuidv4 } from "uuid";
+import { sendTeamInviteEmail } from "@/lib/email";
+
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  }
+
+  const userRole = (session.user as any).role;
+  if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN" && userRole !== "MANAGER") {
+    return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+  }
+
+  try {
+    const body = await req.json();
+    const { email, name, role } = body;
+    const organizationId = (session.user as any).organizationId;
+
+    if (!email || !name || !role) {
+      return NextResponse.json({ error: "Tum alanlar zorunludur" }, { status: 400 });
+    }
+
+    if (!["ADMIN", "MANAGER", "REVIEWER"].includes(role)) {
+      return NextResponse.json({ error: "Gecersiz rol" }, { status: 400 });
+    }
+
+    // Get organization to validate email domain
+    const org = await prisma.organization.findUnique({
+      where: { id: organizationId },
+    });
+    if (!org) {
+      return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+    }
+
+    // Validate email domain matches organization
+    const emailDomain = email.split("@")[1];
+    if (emailDomain !== org.domain) {
+      return NextResponse.json(
+        { error: `E-posta adresi sirket domainle eslesmiyor (${org.domain})` },
+        { status: 400 }
+      );
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: { email, organizationId },
+    });
+    if (existingUser) {
+      return NextResponse.json({ error: "Bu e-posta zaten kayitli" }, { status: 400 });
+    }
+
+    // Check for existing pending invite
+    const existingInvite = await prisma.teamInvite.findFirst({
+      where: { email, organizationId, acceptedAt: null, expiresAt: { gte: new Date() } },
+    });
+    if (existingInvite) {
+      return NextResponse.json({ error: "Bu e-posta icin zaten bekleyen bir davet var" }, { status: 400 });
+    }
+
+    const token = uuidv4();
+    const invite = await prisma.teamInvite.create({
+      data: {
+        email,
+        name,
+        role,
+        token,
+        organizationId,
+        invitedById: (session.user as any).id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      },
+    });
+
+    // Send invite email
+    const appUrl = process.env.APP_URL || process.env.AUTH_URL || "http://localhost:3000";
+    await sendTeamInviteEmail(email, name, org.name, token, appUrl);
+
+    return NextResponse.json({ success: true, invite });
+  } catch (error) {
+    console.error("Invite error:", error);
+    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+  }
+}

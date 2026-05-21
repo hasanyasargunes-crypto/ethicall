@@ -32,6 +32,31 @@ async function main() {
     },
   });
 
+  // Super Admin (platform sahibi)
+  const superOrg = await prisma.organization.upsert({
+    where: { slug: "ethicall" },
+    update: {},
+    create: {
+      name: "EthicAll Platform",
+      slug: "ethicall",
+      domain: "ethicall.com",
+      primaryColor: "#1a56db",
+      plan: "VAULT",
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email_organizationId: { email: "super@ethicall.com", organizationId: superOrg.id } },
+    update: { role: "SUPER_ADMIN" },
+    create: {
+      email: "super@ethicall.com",
+      name: "Super Admin",
+      passwordHash,
+      role: "SUPER_ADMIN",
+      organizationId: superOrg.id,
+    },
+  });
+
   const categories = [
     { name_tr: "Finansal Suistimal", name_en: "Financial Fraud", icon: "Banknote", sortOrder: 0 },
     { name_tr: "Yolsuzluk ve Rüşvet", name_en: "Corruption & Bribery", icon: "Scale", sortOrder: 1 },
