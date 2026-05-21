@@ -20,12 +20,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
     }
 
-    const emailDomain = email.split("@")[1];
-    if (emailDomain !== org.domain) {
-      return NextResponse.json(
-        { error: "Bu e-posta adresi bu organizasyona ait değil" },
-        { status: 400 }
-      );
+    // TRIAL planında domain kontrolünü atla (demo modu)
+    if (org.plan !== "TRIAL") {
+      const emailDomain = email.split("@")[1];
+      if (emailDomain !== org.domain) {
+        return NextResponse.json(
+          { error: "Bu e-posta adresi bu organizasyona ait değil" },
+          { status: 400 }
+        );
+      }
     }
 
     const recentCode = await prisma.verificationCode.findFirst({
@@ -54,6 +57,11 @@ export async function POST(req: NextRequest) {
     });
 
     await sendVerificationEmail(email, code, org.name);
+
+    // TRIAL planındaki organizasyonlarda kodu yanıtta döndür (demo modu)
+    if (org.plan === "TRIAL") {
+      return NextResponse.json({ success: true, demoCode: code });
+    }
 
     return NextResponse.json({ success: true });
   } catch {

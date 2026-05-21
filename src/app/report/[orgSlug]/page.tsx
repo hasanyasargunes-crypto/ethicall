@@ -48,6 +48,10 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
       setLoading(false);
       return;
     }
+    // Demo modunda kodu otomatik doldur
+    if (data.demoCode) {
+      setOtp(data.demoCode);
+    }
     setStep(2);
     setLoading(false);
   }
@@ -172,6 +176,11 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {otp.length === 6 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
+                    📋 Demo modu: Doğrulama kodu otomatik olarak dolduruldu. Doğrudan &quot;Doğrula&quot; butonuna basabilirsiniz.
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="otp">Doğrulama Kodu</Label>
                   <Input
