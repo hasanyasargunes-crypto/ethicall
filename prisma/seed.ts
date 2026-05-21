@@ -35,22 +35,24 @@ async function main() {
   // Super Admin (platform sahibi)
   const superOrg = await prisma.organization.upsert({
     where: { slug: "ethicall" },
-    update: {},
+    update: { primaryColor: "#059669", secondaryColor: "#047857" },
     create: {
       name: "EthicAll Platform",
       slug: "ethicall",
       domain: "ethicall.com",
-      primaryColor: "#1a56db",
+      emailDomain: "gmail.com",
+      primaryColor: "#059669",
+      secondaryColor: "#047857",
       plan: "VAULT",
     },
   });
 
   await prisma.user.upsert({
-    where: { email_organizationId: { email: "super@ethicall.com", organizationId: superOrg.id } },
+    where: { email_organizationId: { email: "hasanyasargunes@gmail.com", organizationId: superOrg.id } },
     update: { role: "SUPER_ADMIN" },
     create: {
-      email: "super@ethicall.com",
-      name: "Super Admin",
+      email: "hasanyasargunes@gmail.com",
+      name: "Hasan Yaşar Güneş",
       passwordHash,
       role: "SUPER_ADMIN",
       organizationId: superOrg.id,

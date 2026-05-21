@@ -30,27 +30,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      orgName,
-      slug,
-      domain,
-      emailDomain,
-      plan,
-      adminName,
-      adminEmail,
-      adminPassword,
+      orgName, slug, domain, emailDomain, plan, billingPeriod,
+      adminName, adminEmail, adminPassword,
     } = body;
 
     if (!orgName || !slug || !domain || !emailDomain || !plan || !adminName || !adminEmail || !adminPassword) {
       return NextResponse.json({ error: "Tum alanlar zorunludur" }, { status: 400 });
     }
 
-    // Check slug uniqueness
     const existing = await prisma.organization.findUnique({ where: { slug } });
     if (existing) {
       return NextResponse.json({ error: "Bu slug zaten kullanilmakta" }, { status: 400 });
     }
 
-    // Validate admin email matches emailDomain
     const adminEmailDomain = adminEmail.split("@")[1];
     if (adminEmailDomain !== emailDomain) {
       return NextResponse.json(
@@ -61,13 +53,25 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await bcrypt.hash(adminPassword, 12);
 
-    // Create organization with admin user and default categories
+    // Calculate plan dates
+    const planStartDate = new Date();
+    const planEndDate = new Date();
+    if (billingPeriod === "YEARLY") {
+      planEndDate.setFullYear(planEndDate.getFullYear() + 1);
+    } else {
+      planEndDate.setMonth(planEndDate.getMonth() + 1);
+    }
+
     const org = await prisma.organization.create({
       data: {
         name: orgName,
         slug,
         domain: emailDomain,
+        emailDomain,
         plan,
+        billingPeriod: billingPeriod || "MONTHLY",
+        planStartDate,
+        planEndDate,
         users: {
           create: {
             email: adminEmail,

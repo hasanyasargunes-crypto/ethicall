@@ -1,196 +1,342 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, Palette, Type, Save } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-const FONTS = [
-  "Inter",
-  "Roboto",
-  "Open Sans",
-  "Poppins",
-  "Nunito",
-  "Lato",
-  "Montserrat",
-  "Source Sans Pro",
-];
-
-const PRESET_COLORS = [
-  { name: "Mavi", primary: "#1a56db", secondary: "#1e40af" },
-  { name: "Yesil", primary: "#059669", secondary: "#047857" },
-  { name: "Mor", primary: "#7c3aed", secondary: "#6d28d9" },
-  { name: "Kirmizi", primary: "#dc2626", secondary: "#b91c1c" },
-  { name: "Turuncu", primary: "#ea580c", secondary: "#c2410c" },
-  { name: "Koyu", primary: "#1f2937", secondary: "#111827" },
-];
+import { useSession } from "next-auth/react";
+import { Mail, Lock, Check, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export default function SettingsPage() {
-  const [primaryColor, setPrimaryColor] = useState("#1a56db");
-  const [secondaryColor, setSecondaryColor] = useState("#1e40af");
-  const [fontFamily, setFontFamily] = useState("Inter");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState("");
+  const { data: session } = useSession();
+  const [activeTab, setActiveTab] = useState<"email" | "password">("email");
 
-  useEffect(() => {
-    async function fetchTheme() {
-      const res = await fetch("/api/settings/theme");
-      if (res.ok) {
-        const data = await res.json();
-        setPrimaryColor(data.primaryColor || "#1a56db");
-        setSecondaryColor(data.secondaryColor || "#1e40af");
-        setFontFamily(data.fontFamily || "Inter");
-      }
-      setLoading(false);
-    }
-    fetchTheme();
-  }, []);
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [emailOtp, setEmailOtp] = useState("");
+  const [emailStep, setEmailStep] = useState<"input" | "verify">("input");
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailSuccess, setEmailSuccess] = useState("");
+  const [emailError, setEmailError] = useState("");
 
-  async function saveTheme() {
-    setSaving(true);
-    setSuccess("");
-    const res = await fetch("/api/settings/theme", {
-      method: "PATCH",
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwSuccess, setPwSuccess] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
+  async function handleSendEmailOtp() {
+    setEmailLoading(true);
+    setEmailError("");
+    const res = await fetch("/api/settings/account", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ primaryColor, secondaryColor, fontFamily }),
+      body: JSON.stringify({ action: "send_otp", newEmail }),
     });
-    if (res.ok) {
-      setSuccess("Tema ayarlari kaydedildi!");
+    const data = await res.json();
+    if (!res.ok) {
+      setEmailError(data.error);
+    } else {
+      setEmailStep("verify");
+      if (data.demoCode) {
+        setEmailOtp(data.demoCode);
+      }
     }
-    setSaving(false);
+    setEmailLoading(false);
   }
 
-  if (loading) {
-    return <div className="text-center py-8">Yukleniyor...</div>;
+  async function handleVerifyEmailOtp() {
+    setEmailLoading(true);
+    setEmailError("");
+    const res = await fetch("/api/settings/account", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "verify_otp", newEmail, otp: emailOtp }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setEmailError(data.error);
+    } else {
+      setEmailSuccess("E-posta adresiniz başarıyla güncellendi. Yeniden giriş yapmanız gerekiyor.");
+      setEmailStep("input");
+      setNewEmail("");
+      setEmailOtp("");
+    }
+    setEmailLoading(false);
   }
+
+  async function handleChangePassword() {
+    setPwError("");
+    if (newPassword.length < 8) {
+      setPwError("Yeni şifre en az 8 karakter olmalıdır");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError("Şifreler eşleşmiyor");
+      return;
+    }
+    setPwLoading(true);
+    const res = await fetch("/api/settings/password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setPwError(data.error);
+    } else {
+      setPwSuccess("Şifreniz başarıyla güncellendi.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+    setPwLoading(false);
+  }
+
+  const tabs = [
+    { key: "email" as const, label: "E-posta Değiştir", icon: Mail },
+    { key: "password" as const, label: "Şifre Değiştir", icon: Lock },
+  ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Ayarlar</h1>
+      <div className="mb-6">
+        <h1 className="page-header">Hesap Ayarları</h1>
+        <p className="page-subtitle">
+          E-posta ve şifre bilgilerinizi güncelleyin
+        </p>
+      </div>
 
-      {success && <div className="bg-green-50 text-green-600 p-3 rounded-md text-sm mb-4">{success}</div>}
+      {/* Current Info */}
+      <div className="bg-white rounded-xl border border-gray-100 p-5 mb-5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-brand-600 text-white flex items-center justify-center text-lg font-bold">
+            {(session?.user?.name || "")
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
+          </div>
+          <div>
+            <p className="text-[15px] font-semibold text-gray-900">
+              {session?.user?.name}
+            </p>
+            <p className="text-[13px] text-gray-500">{session?.user?.email}</p>
+            <p className="text-[12px] text-gray-400">
+              {(session?.user as any)?.organizationName}
+            </p>
+          </div>
+        </div>
+      </div>
 
-      {/* Theme Settings */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Tema Ayarlari
-          </CardTitle>
-          <CardDescription>
-            Panelin renklerini ve fontlarini organizasyonunuza gore ozellestirin.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Color Presets */}
-          <div className="space-y-2">
-            <Label>Hazir Renk Sablonlari</Label>
-            <div className="flex gap-3 flex-wrap">
-              {PRESET_COLORS.map((preset) => (
+      {/* Tabs */}
+      <div className="flex gap-2 mb-5">
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setActiveTab(tab.key);
+              setEmailError("");
+              setPwError("");
+              setEmailSuccess("");
+              setPwSuccess("");
+            }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-[13px] font-medium transition-colors ${
+              activeTab === tab.key
+                ? "bg-brand-50 text-brand-700 border border-brand-200"
+                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+            }`}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        {activeTab === "email" && (
+          <div className="max-w-md">
+            <h3 className="text-[15px] font-semibold text-gray-900 mb-1">
+              E-posta Adresini Değiştir
+            </h3>
+            <p className="text-[13px] text-gray-500 mb-5">
+              Yeni e-posta adresinize bir doğrulama kodu gönderilecektir.
+            </p>
+
+            {emailSuccess && (
+              <div className="flex items-center gap-2 bg-brand-50 text-brand-700 p-3 rounded-lg text-[13px] mb-4">
+                <Check className="h-4 w-4 shrink-0" />
+                {emailSuccess}
+              </div>
+            )}
+            {emailError && (
+              <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-[13px] mb-4">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {emailError}
+              </div>
+            )}
+
+            {emailStep === "input" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                    Yeni E-posta Adresi
+                  </label>
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="yeni@adres.com"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  />
+                </div>
                 <button
-                  key={preset.name}
-                  onClick={() => { setPrimaryColor(preset.primary); setSecondaryColor(preset.secondary); }}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all ${
-                    primaryColor === preset.primary
-                      ? "border-gray-900 bg-gray-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  onClick={handleSendEmailOtp}
+                  disabled={emailLoading || !newEmail}
+                  className="w-full py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
                 >
-                  <div className="flex gap-1">
-                    <div className="w-5 h-5 rounded-full" style={{ backgroundColor: preset.primary }} />
-                    <div className="w-5 h-5 rounded-full" style={{ backgroundColor: preset.secondary }} />
-                  </div>
-                  <span className="text-sm">{preset.name}</span>
+                  {emailLoading ? "Gönderiliyor..." : "Doğrulama Kodu Gönder"}
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
+            )}
 
-          {/* Custom Colors */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Ana Renk</Label>
-              <div className="flex gap-2 items-center">
+            {emailStep === "verify" && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 text-blue-700 p-3 rounded-lg text-[13px]">
+                  <strong>{newEmail}</strong> adresine 6 haneli doğrulama kodu
+                  gönderildi.
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                    Doğrulama Kodu
+                  </label>
+                  <input
+                    type="text"
+                    value={emailOtp}
+                    onChange={(e) => setEmailOtp(e.target.value)}
+                    placeholder="000000"
+                    maxLength={6}
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-center tracking-[0.5em] font-mono text-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setEmailStep("input")}
+                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Geri
+                  </button>
+                  <button
+                    onClick={handleVerifyEmailOtp}
+                    disabled={emailLoading || emailOtp.length < 6}
+                    className="flex-1 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
+                  >
+                    {emailLoading ? "Doğrulanıyor..." : "E-postayı Güncelle"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "password" && (
+          <div className="max-w-md">
+            <h3 className="text-[15px] font-semibold text-gray-900 mb-1">
+              Şifre Değiştir
+            </h3>
+            <p className="text-[13px] text-gray-500 mb-5">
+              Güvenliğiniz için mevcut şifrenizi girerek yeni şifre
+              oluşturabilirsiniz.
+            </p>
+
+            {pwSuccess && (
+              <div className="flex items-center gap-2 bg-brand-50 text-brand-700 p-3 rounded-lg text-[13px] mb-4">
+                <Check className="h-4 w-4 shrink-0" />
+                {pwSuccess}
+              </div>
+            )}
+            {pwError && (
+              <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-[13px] mb-4">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {pwError}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                  Mevcut Şifre
+                </label>
+                <div className="relative">
+                  <input
+                    type={showCurrent ? "text" : "password"}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrent(!showCurrent)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showCurrent ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                  Yeni Şifre
+                </label>
+                <div className="relative">
+                  <input
+                    type={showNew ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="En az 8 karakter"
+                    className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNew(!showNew)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showNew ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                  Yeni Şifre (Tekrar)
+                </label>
                 <input
-                  type="color"
-                  value={primaryColor}
-                  onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer border"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
                 />
-                <Input value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="flex-1" />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Ikincil Renk</Label>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="color"
-                  value={secondaryColor}
-                  onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="w-10 h-10 rounded cursor-pointer border"
-                />
-                <Input value={secondaryColor} onChange={(e) => setSecondaryColor(e.target.value)} className="flex-1" />
-              </div>
-            </div>
-          </div>
-
-          {/* Preview */}
-          <div className="border rounded-lg p-6 bg-gray-50">
-            <p className="text-sm text-gray-500 mb-3">Onizleme</p>
-            <div className="flex gap-3 items-center">
               <button
-                className="px-4 py-2 text-white rounded-lg text-sm font-medium"
-                style={{ backgroundColor: primaryColor }}
+                onClick={handleChangePassword}
+                disabled={pwLoading || !currentPassword || !newPassword}
+                className="w-full py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors"
               >
-                Ana Buton
+                {pwLoading ? "Güncelleniyor..." : "Şifreyi Güncelle"}
               </button>
-              <button
-                className="px-4 py-2 text-white rounded-lg text-sm font-medium"
-                style={{ backgroundColor: secondaryColor }}
-              >
-                Ikincil Buton
-              </button>
-              <div className="px-3 py-1 rounded text-sm" style={{ backgroundColor: primaryColor + "20", color: primaryColor }}>
-                Badge Ornegi
-              </div>
             </div>
           </div>
-
-          {/* Font */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Type className="h-4 w-4" />
-              Font Ailesi
-            </Label>
-            <div className="grid grid-cols-4 gap-2">
-              {FONTS.map((font) => (
-                <button
-                  key={font}
-                  onClick={() => setFontFamily(font)}
-                  className={`px-3 py-2 rounded-lg border-2 text-sm transition-all ${
-                    fontFamily === font
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  style={{ fontFamily: font }}
-                >
-                  {font}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button onClick={saveTheme} disabled={saving} className="gap-2">
-              <Save className="h-4 w-4" />
-              {saving ? "Kaydediliyor..." : "Tema Kaydet"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   );
 }

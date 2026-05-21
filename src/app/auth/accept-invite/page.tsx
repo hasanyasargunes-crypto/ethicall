@@ -2,11 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Shield, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 function AcceptInviteContent() {
@@ -26,11 +22,11 @@ function AcceptInviteContent() {
     setError("");
 
     if (password.length < 8) {
-      setError("Sifre en az 8 karakter olmalidir");
+      setError("Şifre en az 8 karakter olmalıdır");
       return;
     }
     if (password !== confirmPassword) {
-      setError("Sifreler eslesmeli");
+      setError("Şifreler eşleşmiyor");
       return;
     }
 
@@ -55,82 +51,110 @@ function AcceptInviteContent() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardContent className="py-8 text-center">
-            <p className="text-red-500">Gecersiz davet linki. Lutfen e-postanizdaki linki kullanin.</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center max-w-md">
+          <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-3" />
+          <p className="text-sm text-gray-600">
+            Geçersiz davet linki. Lütfen e-postanızdaki linki kullanın.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md text-center">
-          <CardContent className="py-8 space-y-4">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-            <h2 className="text-xl font-bold">Hesabiniz Olusturuldu!</h2>
-            <p className="text-gray-500">{orgName} ekibine basariyla katildiniz.</p>
-            <Link href="/auth/login">
-              <Button className="w-full mt-4">Giris Yap</Button>
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center max-w-md">
+          <CheckCircle className="h-16 w-16 text-brand-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">
+            Hesabınız Oluşturuldu!
+          </h2>
+          <p className="text-[14px] text-gray-500 mb-6">
+            {orgName} ekibine başarıyla katıldınız.
+          </p>
+          <Link
+            href="/auth/login"
+            className="inline-block w-full py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 transition-colors text-center"
+          >
+            Giriş Yap
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Shield className="h-10 w-10 text-blue-600" />
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa] px-4">
+      <div className="w-full max-w-[400px]">
+        <div className="text-center mb-8">
+          <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center mx-auto mb-3">
+            <span className="text-white font-bold text-lg">E</span>
           </div>
-          <CardTitle>Daveti Kabul Et</CardTitle>
-          <CardDescription>
-            Hesabiniz icin bir sifre olusturun.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-4">{error}</div>}
+          <h1 className="text-xl font-bold text-gray-900">Daveti Kabul Et</h1>
+          <p className="text-[13px] text-gray-500 mt-1">
+            Hesabınız için bir şifre oluşturun.
+          </p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          {error && (
+            <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-[13px] mb-4">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Sifre</Label>
-              <Input
+            <div>
+              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                Şifre
+              </label>
+              <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="En az 8 karakter"
                 minLength={8}
                 required
+                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Sifre Tekrar</Label>
-              <Input
+            <div>
+              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                Şifre Tekrar
+              </label>
+              <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Sifrenizi tekrar girin"
+                placeholder="Şifrenizi tekrar girin"
                 required
+                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
               />
             </div>
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Olusturuluyor..." : "Hesabi Olustur & Katil"}
-            </Button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors mt-2"
+            >
+              {loading ? "Oluşturuluyor..." : "Hesabı Oluştur & Katıl"}
+            </button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function AcceptInvitePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-600 border-t-transparent" />
+        </div>
+      }
+    >
       <AcceptInviteContent />
     </Suspense>
   );

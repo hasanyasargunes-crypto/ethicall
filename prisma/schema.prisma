@@ -12,11 +12,15 @@ model Organization {
   name               String
   slug               String         @unique
   domain             String         @unique
+  emailDomain        String?
   logoUrl            String?
-  primaryColor       String?        @default("#1a56db")
-  secondaryColor     String?        @default("#1e40af")
+  primaryColor       String?        @default("#059669")
+  secondaryColor     String?        @default("#047857")
   fontFamily         String?        @default("Inter")
   plan               Plan           @default(TRIAL)
+  billingPeriod      BillingPeriod  @default(MONTHLY)
+  planStartDate      DateTime?
+  planEndDate        DateTime?
   locale             String         @default("tr")
   slaAcknowledgeDays Int            @default(7)
   slaResolveDays     Int            @default(90)
@@ -35,6 +39,16 @@ enum Plan {
   ESSENTIAL
   SHIELD
   VAULT
+}
+
+enum BillingPeriod {
+  MONTHLY
+  YEARLY
+}
+
+enum FormStatus {
+  DRAFT
+  LIVE
 }
 
 model User {
@@ -79,11 +93,17 @@ model Category {
 
 model FormTemplate {
   id             String       @id @default(cuid())
+  name           String       @default("Isimsiz Form")
   categoryId     String       @unique
   category       Category     @relation(fields: [categoryId], references: [id])
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
   fields         Json         @default("[]")
+  status         FormStatus   @default(DRAFT)
+  publicToken    String?      @unique
+  description    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
 }
 
 model Report {

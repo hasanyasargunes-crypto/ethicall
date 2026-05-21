@@ -57,7 +57,7 @@ export async function sendTeamInviteEmail(
         <p>${orgName} sizi EthicAll etik ihbar platformuna davet ediyor.</p>
         <p>Davetinizi kabul etmek ve hesabinizi olusturmak icin asagidaki butona tiklayin:</p>
         <div style="text-align: center; margin: 32px 0;">
-          <a href="${inviteUrl}" style="background: #1a56db; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Daveti Kabul Et</a>
+          <a href="${inviteUrl}" style="background: #059669; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Daveti Kabul Et</a>
         </div>
         <p style="font-size: 12px; color: #6b7280;">Bu davet 7 gun icerisinde gecerliliğini yitirecektir.</p>
         <p style="font-size: 12px; color: #6b7280;">Link calismiyorsa bu URL'yi kopyalayin: ${inviteUrl}</p>

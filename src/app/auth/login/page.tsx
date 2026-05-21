@@ -4,11 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,41 +32,73 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <Link href="/" className="inline-flex items-center justify-center gap-2 mb-4">
-            <Shield className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold">EthicAll</span>
+    <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa] px-4">
+      <div className="w-full max-w-[400px]">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center">
+              <span className="text-white font-bold text-lg">E</span>
+            </div>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">
+              EthicAll
+            </span>
           </Link>
-          <CardTitle>Giriş Yap</CardTitle>
-          <CardDescription>Etik ekip paneline erişmek için giriş yapın</CardDescription>
-        </CardHeader>
-        <CardContent>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-bold text-gray-900">Giriş Yap</h1>
+            <p className="text-[13px] text-gray-500 mt-1">
+              Etik ekip paneline erişmek için giriş yapın
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">{error}</div>
+              <div className="flex items-center gap-2 bg-red-50 text-red-600 p-3 rounded-lg text-[13px]">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {error}
+              </div>
             )}
-            <div className="space-y-2">
-              <Label htmlFor="email">E-posta</Label>
-              <Input id="email" name="email" type="email" required placeholder="admin@sirket.com" />
+            <div>
+              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                E-posta
+              </label>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="admin@sirket.com"
+                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+              />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Şifre</Label>
-              <Input id="password" name="password" type="password" required />
+            <div>
+              <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                Şifre
+              </label>
+              <input
+                name="password"
+                type="password"
+                required
+                className="w-full px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+              />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2.5 bg-brand-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors mt-2"
+            >
               {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-            </Button>
+            </button>
           </form>
-          <p className="text-center text-sm text-gray-500 mt-4">
-            Hesabınız yok mu?{" "}
-            <Link href="/auth/register" className="text-blue-600 hover:underline">
-              Organizasyon Oluşturun
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+
+        <p className="text-center text-[13px] text-gray-400 mt-5">
+          EthicAll - Anonim Etik İhbar Platformu
+        </p>
+      </div>
     </div>
   );
 }
