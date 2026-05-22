@@ -1,22 +1,23 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
 import {
   ClipboardList,
   Plus,
   Trash2,
   GripVertical,
-  Save,
   Globe,
   FileEdit,
   Copy,
   Check,
-  Eye,
   ChevronDown,
   ChevronUp,
-  AlertCircle,
   ToggleLeft,
   ToggleRight,
+  Link2,
+  ExternalLink,
+  Search,
 } from "lucide-react";
 
 type FieldType = "text" | "textarea" | "select" | "checkbox" | "date" | "number" | "email" | "phone";
@@ -69,7 +70,9 @@ export default function FormBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [expandedField, setExpandedField] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const orgSlug = (session?.user as any)?.organizationSlug;
 
   const fetchCategories = useCallback(async () => {
     const res = await fetch("/api/form-template");
@@ -164,13 +167,14 @@ export default function FormBuilderPage() {
     setSaving(false);
   }
 
-  function copyPublicLink() {
-    if (!publicToken) return;
-    const url = `${window.location.origin}/report/${publicToken}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  function copyToClipboard(text: string, key: string) {
+    navigator.clipboard.writeText(text);
+    setCopiedLink(key);
+    setTimeout(() => setCopiedLink(null), 2000);
   }
+
+  const reportLink = orgSlug ? `${typeof window !== "undefined" ? window.location.origin : ""}/report/${orgSlug}` : "";
+  const trackLink = typeof window !== "undefined" ? `${window.location.origin}/report/track` : "";
 
   if (loading) {
     return (
@@ -181,15 +185,122 @@ export default function FormBuilderPage() {
   }
 
   const currentCat = categories.find((c) => c.id === selectedCat);
+  const liveCount = categories.filter((c) => c.formTemplate?.status === "LIVE").length;
+  const draftCount = categories.filter((c) => c.formTemplate && c.formTemplate.status === "DRAFT").length;
 
   return (
     <div>
+      {/* Page Header */}
       <div className="mb-6">
         <h1 className="page-header">İhbar Formu Düzenleyici</h1>
         <p className="page-subtitle">
           Her kategori için özel form alanları ekleyin, taslak olarak tutun veya
           canlıya alın.
         </p>
+      </div>
+
+      {/* Quick Links Bar */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {/* Complaint Link */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
+              <Link2 className="h-4 w-4 text-brand-600" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-gray-900">İhbar Formu Linki</p>
+              <p className="text-[11px] text-gray-400">Çalışanlarla paylaşın</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono text-[12px] text-gray-600 truncate">
+              {reportLink || "Organizasyon bilgisi yükleniyor..."}
+            </div>
+            <button
+              onClick={() => reportLink && copyToClipboard(reportLink, "report")}
+              disabled={!reportLink}
+              className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium text-brand-600 bg-brand-50 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors disabled:opacity-50 shrink-0"
+            >
+              {copiedLink === "report" ? (
+                <>
+                  <Check className="h-3.5 w-3.5" /> Kopyalandı
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" /> Kopyala
+                </>
+              )}
+            </button>
+            {reportLink && (
+              <a
+                href={reportLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-400 hover:text-brand-600 transition-colors"
+                title="Yeni sekmede aç"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Tracking Link */}
+        <div className="bg-white rounded-xl border border-gray-100 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <Search className="h-4 w-4 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-gray-900">İhbar Takip Linki</p>
+              <p className="text-[11px] text-gray-400">İhbarcılar durumlarını takip etsin</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono text-[12px] text-gray-600 truncate">
+              {trackLink}
+            </div>
+            <button
+              onClick={() => copyToClipboard(trackLink, "track")}
+              className="flex items-center gap-1.5 px-3 py-2 text-[12px] font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors shrink-0"
+            >
+              {copiedLink === "track" ? (
+                <>
+                  <Check className="h-3.5 w-3.5" /> Kopyalandı
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5" /> Kopyala
+                </>
+              )}
+            </button>
+            <a
+              href={trackLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+              title="Yeni sekmede aç"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Row */}
+      <div className="flex items-center gap-4 mb-5">
+        <div className="flex items-center gap-2 text-[13px] text-gray-500">
+          <span className="w-2 h-2 rounded-full bg-brand-500" />
+          {liveCount} canlı form
+        </div>
+        <div className="flex items-center gap-2 text-[13px] text-gray-500">
+          <span className="w-2 h-2 rounded-full bg-amber-500" />
+          {draftCount} taslak
+        </div>
+        <div className="flex items-center gap-2 text-[13px] text-gray-500">
+          <span className="w-2 h-2 rounded-full bg-gray-300" />
+          {categories.length - liveCount - draftCount} yapılandırılmamış
+        </div>
       </div>
 
       <div className="grid grid-cols-12 gap-5">
@@ -205,6 +316,7 @@ export default function FormBuilderPage() {
               {categories.map((cat) => {
                 const hasTemplate = cat.formTemplate && (cat.formTemplate.fields as FormField[]).length > 0;
                 const isLive = cat.formTemplate?.status === "LIVE";
+                const isDraft = cat.formTemplate?.status === "DRAFT";
                 return (
                   <button
                     key={cat.id}
@@ -217,14 +329,17 @@ export default function FormBuilderPage() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="truncate">{cat.name_tr}</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         {hasTemplate && (
                           <span className="text-[9px] text-gray-400">
                             {(cat.formTemplate!.fields as FormField[]).length}
                           </span>
                         )}
                         {isLive && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-500" title="Canlı" />
+                        )}
+                        {isDraft && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Taslak" />
                         )}
                       </div>
                     </div>
@@ -296,23 +411,28 @@ export default function FormBuilderPage() {
               </div>
             </div>
 
-            {/* Public Link */}
+            {/* Category-specific Public Link (when LIVE) */}
             {publicToken && formStatus === "LIVE" && (
-              <div className="px-6 py-3 bg-brand-50 border-b border-brand-100 flex items-center justify-between">
+              <div className="px-6 py-3 bg-brand-50/50 border-b border-brand-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Globe className="h-4 w-4 text-brand-600" />
                   <span className="text-[13px] text-brand-700">
-                    Canlı form linki:
+                    Bu kategorinin canlı form linki:
                   </span>
                   <code className="text-[12px] bg-white px-2 py-1 rounded border border-brand-200 text-brand-800 font-mono">
-                    {window.location.origin}/report/{publicToken}
+                    {typeof window !== "undefined" ? window.location.origin : ""}/report/{publicToken}
                   </code>
                 </div>
                 <button
-                  onClick={copyPublicLink}
+                  onClick={() =>
+                    copyToClipboard(
+                      `${window.location.origin}/report/${publicToken}`,
+                      "publicToken"
+                    )
+                  }
                   className="flex items-center gap-1 text-[12px] text-brand-600 hover:text-brand-700 font-medium"
                 >
-                  {copied ? (
+                  {copiedLink === "publicToken" ? (
                     <>
                       <Check className="h-3.5 w-3.5" /> Kopyalandı
                     </>

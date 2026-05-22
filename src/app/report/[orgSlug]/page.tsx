@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import { Shield, Lock, CheckCircle, Send, ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
+import Image from "next/image";
 
 const SEVERITY_OPTIONS = [
   { value: "LOW", label: "Düşük", color: "bg-gray-100 text-gray-700" },
@@ -19,6 +19,15 @@ const SEVERITY_OPTIONS = [
 ];
 
 type Category = { id: string; name_tr: string; name_en: string; icon: string };
+
+type OrgBranding = {
+  name: string;
+  slug: string;
+  logoUrl: string | null;
+  primaryColor: string | null;
+  secondaryColor: string | null;
+  fontFamily: string | null;
+};
 
 export default function ReportPage({ params }: { params: Promise<{ orgSlug: string }> }) {
   const { orgSlug } = use(params);
@@ -33,6 +42,27 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
   const [trackingCode, setTrackingCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [branding, setBranding] = useState<OrgBranding | null>(null);
+
+  // Fetch org branding
+  useEffect(() => {
+    async function fetchBranding() {
+      try {
+        const res = await fetch(`/api/org-branding?slug=${orgSlug}`);
+        if (res.ok) {
+          const data = await res.json();
+          setBranding(data);
+        }
+      } catch {
+        // Silently fail - will use defaults
+      }
+    }
+    fetchBranding();
+  }, [orgSlug]);
+
+  const primaryColor = branding?.primaryColor || "#059669";
+  const secondaryColor = branding?.secondaryColor || "#047857";
+  const orgName = branding?.name || orgSlug;
 
   async function sendOtp() {
     setLoading(true);
@@ -48,7 +78,6 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
       setLoading(false);
       return;
     }
-    // Demo modunda kodu otomatik doldur
     if (data.demoCode) {
       setOtp(data.demoCode);
     }
@@ -108,19 +137,52 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
   const progressValue = (step / 5) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-50">
-      <header className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-2">
-          <Shield className="h-6 w-6 text-blue-600" />
-          <span className="font-bold text-lg">EthicAll</span>
-          <span className="text-gray-400 mx-2">|</span>
-          <span className="text-gray-600">{orgSlug}</span>
+    <div
+      className="min-h-screen"
+      style={{
+        background: `linear-gradient(to bottom, ${primaryColor}08, ${primaryColor}03, #f9fafb)`,
+      }}
+    >
+      {/* Dynamic Header */}
+      <header className="bg-white border-b" style={{ borderBottomColor: `${primaryColor}20` }}>
+        <div className="container mx-auto px-4 py-4 flex items-center gap-3">
+          {branding?.logoUrl ? (
+            <Image
+              src={branding.logoUrl}
+              alt={orgName}
+              width={36}
+              height={36}
+              className="rounded-lg object-contain"
+              unoptimized
+            />
+          ) : (
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+              style={{ backgroundColor: primaryColor }}
+            >
+              {orgName.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <span className="font-bold text-lg text-gray-900">{orgName}</span>
+            <span className="text-gray-400 mx-2">|</span>
+            <span className="text-gray-500 text-sm">Etik İhbar Hattı</span>
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
+        {/* Progress */}
         <div className="mb-6">
-          <Progress value={progressValue} className="h-2" />
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${progressValue}%`,
+                backgroundColor: primaryColor,
+              }}
+            />
+          </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>E-posta Doğrulama</span>
             <span>Kategori</span>
@@ -129,7 +191,16 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg p-3 mb-6 text-sm text-green-700">
+        {/* Privacy Notice */}
+        <div
+          className="flex items-center gap-2 rounded-lg p-3 mb-6 text-sm"
+          style={{
+            backgroundColor: `${primaryColor}08`,
+            borderColor: `${primaryColor}25`,
+            color: secondaryColor,
+            border: `1px solid ${primaryColor}25`,
+          }}
+        >
           <Lock className="h-4 w-4 shrink-0" />
           <span>Kimliğiniz tamamen gizli tutulmaktadır. E-posta adresiniz şirketinizle paylaşılmayacaktır.</span>
         </div>
@@ -158,7 +229,12 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                     placeholder={`ornek@${orgSlug}.com`}
                   />
                 </div>
-                <Button onClick={sendOtp} disabled={!email || loading} className="w-full">
+                <Button
+                  onClick={sendOtp}
+                  disabled={!email || loading}
+                  className="w-full text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   {loading ? "Gönderiliyor..." : "Doğrulama Kodu Gönder"}
                 </Button>
               </div>
@@ -177,8 +253,15 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
             <CardContent>
               <div className="space-y-4">
                 {otp.length === 6 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700">
-                    📋 Demo modu: Doğrulama kodu otomatik olarak dolduruldu. Doğrudan &quot;Doğrula&quot; butonuna basabilirsiniz.
+                  <div
+                    className="rounded-lg p-3 text-sm"
+                    style={{
+                      backgroundColor: `${primaryColor}08`,
+                      border: `1px solid ${primaryColor}25`,
+                      color: secondaryColor,
+                    }}
+                  >
+                    Demo modu: Doğrulama kodu otomatik olarak dolduruldu. Doğrudan &quot;Doğrula&quot; butonuna basabilirsiniz.
                   </div>
                 )}
                 <div className="space-y-2">
@@ -192,7 +275,12 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                     className="text-center text-2xl tracking-widest"
                   />
                 </div>
-                <Button onClick={verifyOtp} disabled={otp.length !== 6 || loading} className="w-full">
+                <Button
+                  onClick={verifyOtp}
+                  disabled={otp.length !== 6 || loading}
+                  className="w-full text-white"
+                  style={{ backgroundColor: primaryColor }}
+                >
                   {loading ? "Doğrulanıyor..." : "Doğrula"}
                 </Button>
                 <Button variant="ghost" onClick={() => setStep(1)} className="w-full">
@@ -218,11 +306,25 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                       setSelectedCategory(cat.id);
                       setStep(4);
                     }}
-                    className={`p-4 rounded-lg border-2 text-left transition-all hover:border-blue-400 hover:bg-blue-50 ${
-                      selectedCategory === cat.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200"
-                    }`}
+                    className="p-4 rounded-lg border-2 text-left transition-all"
+                    style={{
+                      borderColor:
+                        selectedCategory === cat.id ? primaryColor : "#e5e7eb",
+                      backgroundColor:
+                        selectedCategory === cat.id ? `${primaryColor}08` : "white",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedCategory !== cat.id) {
+                        (e.target as HTMLElement).style.borderColor = `${primaryColor}60`;
+                        (e.target as HTMLElement).style.backgroundColor = `${primaryColor}05`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedCategory !== cat.id) {
+                        (e.target as HTMLElement).style.borderColor = "#e5e7eb";
+                        (e.target as HTMLElement).style.backgroundColor = "white";
+                      }
+                    }}
                   >
                     <p className="font-medium">{cat.name_tr}</p>
                     <p className="text-sm text-gray-500">{cat.name_en}</p>
@@ -269,9 +371,14 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                         onClick={() => setSeverity(opt.value)}
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                           severity === opt.value
-                            ? opt.color + " ring-2 ring-offset-1 ring-blue-400"
+                            ? opt.color + " ring-2 ring-offset-1"
                             : "bg-gray-100 text-gray-600"
                         }`}
+                        style={
+                          severity === opt.value
+                            ? { "--tw-ring-color": primaryColor } as React.CSSProperties
+                            : undefined
+                        }
                       >
                         {opt.label}
                       </button>
@@ -285,7 +392,8 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                   <Button
                     onClick={submitReport}
                     disabled={!title || !description || loading}
-                    className="flex-1"
+                    className="flex-1 text-white"
+                    style={{ backgroundColor: primaryColor }}
                   >
                     {loading ? "Gönderiliyor..." : (
                       <>İhbarı Gönder <Send className="h-4 w-4 ml-2" /></>
@@ -300,14 +408,17 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
         {step === 5 && (
           <Card className="text-center">
             <CardHeader>
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <CheckCircle className="h-16 w-16 mx-auto mb-4" style={{ color: primaryColor }} />
               <CardTitle className="text-2xl">İhbarınız Alındı</CardTitle>
               <CardDescription>İhbarınız başarıyla iletildi.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-gray-50 rounded-lg p-6">
                 <p className="text-sm text-gray-500 mb-2">Takip Kodunuz</p>
-                <p className="text-3xl font-mono font-bold text-blue-600 tracking-wider">
+                <p
+                  className="text-3xl font-mono font-bold tracking-wider"
+                  style={{ color: primaryColor }}
+                >
                   {trackingCode}
                 </p>
               </div>
@@ -323,6 +434,17 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
           </Card>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="mt-auto py-6 text-center">
+        <p className="text-xs text-gray-400">
+          Bu platform{" "}
+          <Link href="/" className="underline hover:text-gray-500">
+            EthicAll
+          </Link>{" "}
+          tarafından desteklenmektedir.
+        </p>
+      </footer>
     </div>
   );
 }
