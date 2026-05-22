@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -39,6 +40,11 @@ export async function POST(req: NextRequest) {
     where: { id: userId },
     data: { passwordHash },
   });
+
+  // Send password change notification (non-blocking)
+  sendPasswordChangedEmail(user.email, user.name).catch((err) =>
+    console.error("Password change email error:", err)
+  );
 
   return NextResponse.json({ success: true });
 }

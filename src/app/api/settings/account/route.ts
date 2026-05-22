@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmailChangeVerificationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -30,13 +31,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // In dev/demo mode, return the code
-    const isDev = !process.env.RESEND_API_KEY;
+    // Get user name for email template
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+
+    // Send verification email via Brevo
+    await sendEmailChangeVerificationEmail(newEmail, code, user?.name || "Kullanici");
+
+    // In dev/demo mode, also return the code in response
+    const isDev = !process.env.BREVO_API_KEY;
     if (isDev) {
       return NextResponse.json({ success: true, demoCode: code });
     }
 
-    // TODO: Send email with code
     return NextResponse.json({ success: true });
   }
 

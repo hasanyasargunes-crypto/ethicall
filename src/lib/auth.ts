@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { sendLoginNotificationEmail } from "./email";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -25,6 +26,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
         if (!isValid) return null;
+
+        // Send login notification email (non-blocking)
+        sendLoginNotificationEmail(user.email, user.name).catch((err) =>
+          console.error("Login notification email error:", err)
+        );
 
         return {
           id: user.id,

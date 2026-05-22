@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { reportSchema } from "@/lib/validation";
 import { generateTrackingCode } from "@/lib/tracking-code";
+import { sendReportConfirmationEmail, sendNewReportNotificationEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,6 +54,38 @@ export async function POST(req: NextRequest) {
         details: { trackingCode },
       },
     });
+
+    // Get category name for notification
+    const category = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { name_tr: true },
+    });
+
+    // Send confirmation email to reporter (non-blocking)
+    sendReportConfirmationEmail(reporterEmail, trackingCode, org.name).catch((err) =>
+      console.error("Report confirmation email error:", err)
+    );
+
+    // Send notification to org admins/managers (non-blocking)
+    const managers = await prisma.user.findMany({
+      where: {
+        organizationId: org.id,
+        role: { in: ["ADMIN", "MANAGER"] },
+      },
+      select: { email: true, name: true },
+    });
+    for (const mgr of managers) {
+      sendNewReportNotificationEmail(
+        mgr.email,
+        mgr.name,
+        title,
+        category?.name_tr || "Belirtilmemis",
+        severity as string,
+        org.name
+      ).catch((err) =>
+        console.error("New report notification email error:", err)
+      );
+    }
 
     return NextResponse.json({ trackingCode });
   } catch (error) {

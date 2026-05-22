@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { Shield, Lock, CheckCircle, Send, ArrowRight, ArrowLeft } from "lucide-react";
+import { Shield, Lock, CheckCircle, Send, ArrowRight, ArrowLeft, Paperclip, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,6 +43,8 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [branding, setBranding] = useState<OrgBranding | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch org branding
   useEffect(() => {
@@ -108,6 +110,30 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
     setLoading(false);
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files) return;
+    const newFiles = Array.from(e.target.files);
+    const validFiles = newFiles.filter((f) => {
+      if (f.size > 10 * 1024 * 1024) {
+        setError("Dosya boyutu 10MB'yi asamaz");
+        return false;
+      }
+      return true;
+    });
+    setFiles((prev) => [...prev, ...validFiles].slice(0, 5)); // Max 5 files
+    e.target.value = ""; // Reset input
+  }
+
+  function removeFile(index: number) {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function formatFileSize(bytes: number) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+
   async function submitReport() {
     setLoading(true);
     setError("");
@@ -129,6 +155,21 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
       setLoading(false);
       return;
     }
+
+    // Upload files if any
+    if (files.length > 0) {
+      setUploading(true);
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("trackingCode", data.trackingCode);
+        await fetch("/api/upload", { method: "POST", body: formData }).catch(
+          (err) => console.error("File upload error:", err)
+        );
+      }
+      setUploading(false);
+    }
+
     setTrackingCode(data.trackingCode);
     setStep(5);
     setLoading(false);
@@ -385,18 +426,62 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                     ))}
                   </div>
                 </div>
+                {/* File Upload */}
+                <div className="space-y-2">
+                  <Label>Belge Ekle (opsiyonel)</Label>
+                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-gray-300 transition-colors">
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+                      />
+                      <Paperclip className="h-6 w-6 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-500">
+                        Dosya eklemek icin tiklayin veya surekleyin
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        PDF, resim, Word, Excel (maks. 10MB, en fazla 5 dosya)
+                      </p>
+                    </label>
+                  </div>
+                  {files.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      {files.map((file, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2"
+                        >
+                          <FileText className="h-4 w-4 text-gray-400 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-gray-700 truncate">{file.name}</p>
+                            <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                          </div>
+                          <button
+                            onClick={() => removeFile(i)}
+                            className="p-1 text-gray-400 hover:text-red-500"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-2" /> Geri
                   </Button>
                   <Button
                     onClick={submitReport}
-                    disabled={!title || !description || loading}
+                    disabled={!title || !description || loading || uploading}
                     className="flex-1 text-white"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {loading ? "Gönderiliyor..." : (
-                      <>İhbarı Gönder <Send className="h-4 w-4 ml-2" /></>
+                    {uploading ? "Dosyalar yukleniyor..." : loading ? "Gonderiliyor..." : (
+                      <>Ihbari Gonder <Send className="h-4 w-4 ml-2" /></>
                     )}
                   </Button>
                 </div>

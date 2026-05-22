@@ -15,6 +15,7 @@ import {
   Inbox,
   ChevronDown,
   Building2,
+  ScrollText,
 } from "lucide-react";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
@@ -54,6 +55,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     { href: "/dashboard/reports", label: "İhbarlar", icon: FileText },
     { href: "/dashboard/form-builder", label: "İhbar Formu", icon: ClipboardList },
     { href: "/dashboard/team", label: "Ekip", icon: Users },
+    { href: "/dashboard/audit-log", label: "Denetim Kayıtları", icon: ScrollText },
   ];
 
   const adminNav = isSuperAdmin
