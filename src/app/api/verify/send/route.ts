@@ -22,10 +22,12 @@ export async function POST(req: NextRequest) {
 
     // TRIAL planında domain kontrolünü atla (demo modu)
     if (org.plan !== "TRIAL") {
-      const emailDomain = email.split("@")[1];
-      if (emailDomain !== org.domain) {
+      const senderDomain = email.split("@")[1];
+      // emailDomain alanı varsa onu kullan, yoksa domain alanını kullan
+      const allowedDomain = org.emailDomain || org.domain;
+      if (senderDomain !== allowedDomain) {
         return NextResponse.json(
-          { error: "Bu e-posta adresi bu organizasyona ait değil" },
+          { error: `Bu e-posta adresi bu organizasyona ait değil. Beklenen: @${allowedDomain}` },
           { status: 400 }
         );
       }
