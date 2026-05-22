@@ -62,11 +62,17 @@ export async function POST(req: NextRequest) {
       planEndDate.setMonth(planEndDate.getMonth() + 1);
     }
 
+    // Check if domain already taken
+    const existingDomain = await prisma.organization.findUnique({ where: { domain } });
+    if (existingDomain) {
+      return NextResponse.json({ error: "Bu domain zaten kullanılmakta" }, { status: 400 });
+    }
+
     const org = await prisma.organization.create({
       data: {
         name: orgName,
         slug,
-        domain: emailDomain,
+        domain,
         emailDomain,
         plan,
         billingPeriod: billingPeriod || "MONTHLY",
@@ -104,6 +110,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(org);
   } catch (error: any) {
     console.error("Create org error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    if (error?.code === "P2002") {
+      const target = error.meta?.target;
+      if (target?.includes("domain")) {
+        return NextResponse.json({ error: "Bu domain zaten kullanılmakta" }, { status: 400 });
+      }
+      if (target?.includes("slug")) {
+        return NextResponse.json({ error: "Bu slug zaten kullanılmakta" }, { status: 400 });
+      }
+      if (target?.includes("email")) {
+        return NextResponse.json({ error: "Bu e-posta adresi zaten kayıtlı" }, { status: 400 });
+      }
+      return NextResponse.json({ error: "Bu kayıt zaten mevcut" }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Sunucu hatasi: " + (error?.message || "Bilinmeyen hata") }, { status: 500 });
   }
 }
