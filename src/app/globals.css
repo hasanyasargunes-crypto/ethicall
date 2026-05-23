@@ -106,6 +106,19 @@
   }
 }
 
+/* Mobile sidebar system */
+.mobile-only {
+  display: flex !important;
+}
+@media (min-width: 1024px) {
+  .mobile-only {
+    display: none !important;
+  }
+  .sidebar-drawer {
+    transform: translateX(0) !important;
+  }
+}
+
 /* Brevo-inspired clean styles */
 @layer components {
   .sidebar-item {

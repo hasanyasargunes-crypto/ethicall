@@ -91,7 +91,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-[#f8f9fa]">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 z-40 flex items-center px-4 gap-3">
+      <div className="mobile-only fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 z-40 items-center px-4 gap-3">
         <button
           onClick={() => setSidebarOpen(true)}
           className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
@@ -109,19 +109,19 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* Overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/40 z-40"
+          className="mobile-only fixed inset-0 z-40"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`
-          w-[240px] bg-white border-r border-gray-100 flex flex-col fixed h-screen z-50
-          transition-transform duration-300 ease-in-out
-          lg:translate-x-0
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        `}
+        className="sidebar-drawer w-[240px] bg-white border-r border-gray-100 flex flex-col fixed h-screen z-50"
+        style={{
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 300ms ease-in-out",
+        }}
       >
         {/* Logo */}
         <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -135,7 +135,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="mobile-only p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           >
             <X className="h-5 w-5" />
           </button>
