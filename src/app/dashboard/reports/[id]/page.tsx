@@ -136,18 +136,18 @@ export default function ReportDetailPage({
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-start gap-3 sm:gap-4 mb-6">
         <Link
           href="/dashboard/reports"
-          className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0 mt-0.5"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
-        <div className="flex-1">
-          <div className="flex items-center gap-3">
-            <h1 className="page-header">{report.title}</h1>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+            <h1 className="page-header truncate">{report.title}</h1>
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0 w-fit ${
                 STATUS_COLORS[report.status]
               }`}
             >
@@ -174,10 +174,10 @@ export default function ReportDetailPage({
         <div className="lg:col-span-2 space-y-5">
           {/* Description */}
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
               <h3 className="section-title">Açıklama</h3>
             </div>
-            <div className="px-6 py-5">
+            <div className="px-4 sm:px-6 py-5">
               <p className="text-[14px] text-gray-700 whitespace-pre-wrap leading-relaxed">
                 {report.description}
               </p>
@@ -190,10 +190,10 @@ export default function ReportDetailPage({
 
           {/* Messages */}
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
               <h3 className="section-title">Mesajlar</h3>
             </div>
-            <div className="px-6 py-5">
+            <div className="px-4 sm:px-6 py-5">
               <div className="space-y-3 mb-5 max-h-96 overflow-y-auto">
                 {report.messages.length === 0 && (
                   <p className="text-gray-400 text-center py-8 text-sm">
@@ -205,10 +205,10 @@ export default function ReportDetailPage({
                     key={msg.id}
                     className={`p-4 rounded-xl ${
                       msg.senderType === "REPORTER"
-                        ? "bg-amber-50 mr-12"
+                        ? "bg-amber-50 mr-4 sm:mr-12"
                         : msg.senderType === "SYSTEM"
                         ? "bg-gray-50 text-center text-sm"
-                        : "bg-brand-50/50 ml-12"
+                        : "bg-brand-50/50 ml-4 sm:ml-12"
                     }`}
                   >
                     <p className="text-[11px] text-gray-400 mb-1.5">

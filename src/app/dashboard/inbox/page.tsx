@@ -9,6 +9,7 @@ import {
   MailOpen,
   MessageSquare,
   ArrowUpRight,
+  ArrowLeft,
   Filter,
   User,
   Users,
@@ -98,9 +99,9 @@ export default function InboxPage() {
         </p>
       </div>
 
-      <div className="flex gap-5 h-[calc(100vh-180px)]">
+      <div className="flex flex-col lg:flex-row gap-5 h-[calc(100vh-220px)] lg:h-[calc(100vh-180px)]">
         {/* Left Panel - Filter & List */}
-        <div className="w-[380px] flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className={`w-full lg:w-[380px] flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden ${selectedMsg ? "hidden lg:flex" : "flex"}`}>
           {/* Search */}
           <div className="p-3 border-b border-gray-100">
             <div className="relative">
@@ -207,13 +208,19 @@ export default function InboxPage() {
         </div>
 
         {/* Right Panel - Message Detail */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className={`flex-1 bg-white rounded-xl border border-gray-100 overflow-hidden ${selectedMsg ? "flex" : "hidden lg:flex"}`}>
           {selectedMsg ? (
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full w-full">
               {/* Header */}
-              <div className="px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div>
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <button
+                      onClick={() => setSelectedMsg(null)}
+                      className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 shrink-0"
+                    >
+                      <ArrowLeft className="h-5 w-5" />
+                    </button>
                     <div className="flex items-center gap-2 mb-1">
                       <span
                         className={`w-2 h-2 rounded-full ${
@@ -233,16 +240,16 @@ export default function InboxPage() {
                   </div>
                   <Link
                     href={`/dashboard/reports/${selectedMsg.report.id}`}
-                    className="flex items-center gap-1.5 text-[13px] text-brand-600 hover:text-brand-700 font-medium bg-brand-50 px-3 py-1.5 rounded-lg"
+                    className="flex items-center gap-1.5 text-[13px] text-brand-600 hover:text-brand-700 font-medium bg-brand-50 px-3 py-1.5 rounded-lg shrink-0"
                   >
-                    Dosyaya Git
+                    <span className="hidden sm:inline">Dosyaya Git</span>
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
 
               {/* Message Content */}
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 <div className="max-w-2xl">
                   <div className="flex items-center gap-3 mb-4">
                     <div
@@ -279,7 +286,7 @@ export default function InboxPage() {
               </div>
 
               {/* Reply Box */}
-              <div className="border-t border-gray-100 px-6 py-4">
+              <div className="border-t border-gray-100 px-4 sm:px-6 py-4">
                 <div className="flex gap-3">
                   <input
                     type="text"

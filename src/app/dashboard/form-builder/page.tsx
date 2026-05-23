@@ -303,9 +303,9 @@ export default function FormBuilderPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Category Sidebar */}
-        <div className="col-span-3">
+        <div className="lg:col-span-3">
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100">
               <p className="text-[12px] font-semibold text-gray-500 uppercase tracking-wide">
@@ -351,11 +351,11 @@ export default function FormBuilderPage() {
         </div>
 
         {/* Form Editor */}
-        <div className="col-span-9">
+        <div className="lg:col-span-9">
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             {/* Header */}
-            <div className="px-6 py-4 border-b border-gray-100">
-              <div className="flex items-center justify-between">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
                 <div className="flex items-center gap-3">
                   <ClipboardList className="h-5 w-5 text-brand-600" />
                   <div>
@@ -383,13 +383,14 @@ export default function FormBuilderPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     onClick={addField}
                     className="flex items-center gap-1.5 px-3 py-2 text-[13px] text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
                     <Plus className="h-4 w-4" />
-                    Alan Ekle
+                    <span className="hidden sm:inline">Alan Ekle</span>
+                    <span className="sm:hidden">Ekle</span>
                   </button>
                   <button
                     onClick={() => saveTemplate("DRAFT")}
@@ -397,15 +398,16 @@ export default function FormBuilderPage() {
                     className="flex items-center gap-1.5 px-3 py-2 text-[13px] text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
                     <FileEdit className="h-4 w-4" />
-                    Taslak Kaydet
+                    <span className="hidden sm:inline">Taslak Kaydet</span>
+                    <span className="sm:hidden">Taslak</span>
                   </button>
                   <button
                     onClick={() => saveTemplate("LIVE")}
                     disabled={saving}
-                    className="flex items-center gap-1.5 px-4 py-2 text-[13px] text-white bg-brand-600 rounded-lg hover:bg-brand-700 font-medium"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-2 text-[13px] text-white bg-brand-600 rounded-lg hover:bg-brand-700 font-medium"
                   >
                     <Globe className="h-4 w-4" />
-                    {saving ? "Kaydediliyor..." : "Canlıya Al"}
+                    {saving ? "..." : "Canlıya Al"}
                   </button>
                 </div>
               </div>
@@ -454,8 +456,8 @@ export default function FormBuilderPage() {
             )}
 
             {/* Form Meta */}
-            <div className="px-6 pt-5 space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="px-4 sm:px-6 pt-5 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-medium text-gray-600 mb-1">
                     Form Adı
@@ -566,7 +568,7 @@ export default function FormBuilderPage() {
                         {/* Expanded Editor */}
                         {isExpanded && (
                           <div className="px-4 pb-4 pt-1 border-t border-gray-100 space-y-3">
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div>
                                 <label className="block text-[11px] font-medium text-gray-500 mb-1">
                                   Alan Adı

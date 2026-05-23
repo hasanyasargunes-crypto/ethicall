@@ -147,10 +147,10 @@ export default function TrackPage() {
                       key={msg.id}
                       className={`p-3 rounded-lg ${
                         msg.senderType === "REPORTER"
-                          ? "bg-blue-50 ml-8"
+                          ? "bg-blue-50 ml-4 sm:ml-8"
                           : msg.senderType === "SYSTEM"
                           ? "bg-gray-50 text-center text-sm"
-                          : "bg-gray-100 mr-8"
+                          : "bg-gray-100 mr-4 sm:mr-8"
                       }`}
                     >
                       <p className="text-xs text-gray-500 mb-1">

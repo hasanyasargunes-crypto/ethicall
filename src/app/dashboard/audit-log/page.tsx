@@ -156,7 +156,7 @@ export default function AuditLogPage() {
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-5">
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
@@ -206,8 +206,8 @@ export default function AuditLogPage() {
               const info = getActionInfo(log.action);
               const details = formatDetails(log.details);
               return (
-                <div key={log.id} className="px-5 py-3.5 hover:bg-gray-50/50 transition-colors">
-                  <div className="flex items-start gap-4">
+                <div key={log.id} className="px-3 sm:px-5 py-3.5 hover:bg-gray-50/50 transition-colors">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     {/* Timeline dot */}
                     <div className="flex flex-col items-center pt-1">
                       <div

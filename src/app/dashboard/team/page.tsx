@@ -109,7 +109,7 @@ export default function TeamPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="page-header">Ekip Yönetimi</h1>
           <p className="page-subtitle">
@@ -118,7 +118,7 @@ export default function TeamPage() {
         </div>
         <button
           onClick={() => setShowInvite(!showInvite)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors shrink-0"
         >
           <Plus className="h-4 w-4" />
           Davet Gönder
@@ -151,9 +151,9 @@ export default function TeamPage() {
               yapabilsin.
             </p>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <form onSubmit={handleInvite} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
                     Ad Soyad
@@ -184,7 +184,7 @@ export default function TeamPage() {
                 <label className="block text-[13px] font-medium text-gray-700 mb-2">
                   Yetki
                 </label>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   {ROLES.map((r) => (
                     <button
                       key={r.value}
@@ -242,7 +242,7 @@ export default function TeamPage() {
             {members.map((m) => (
               <div
                 key={m.id}
-                className="px-6 py-3.5 flex items-center justify-between hover:bg-gray-50/50"
+                className="px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3 hover:bg-gray-50/50"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-[12px] font-bold">
@@ -286,7 +286,7 @@ export default function TeamPage() {
             {invites.map((inv) => (
               <div
                 key={inv.id}
-                className="px-6 py-3.5 flex items-center justify-between"
+                className="px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3"
               >
                 <div>
                   <p className="text-[13px] font-medium text-gray-900">

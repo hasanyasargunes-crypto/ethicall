@@ -237,7 +237,7 @@ export default function UsersPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-gray-50 rounded-xl p-5 space-y-4">
                 <h4 className="text-[13px] font-semibold text-gray-700 uppercase tracking-wide">Şirket Bilgileri</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Şirket Adı</label>
                     <input value={orgName} onChange={(e) => handleOrgNameChange(e.target.value)} placeholder="Örnek A.Ş." required className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
@@ -282,7 +282,7 @@ export default function UsersPage() {
               </div>
               <div className="bg-gray-50 rounded-xl p-5 space-y-4">
                 <h4 className="text-[13px] font-semibold text-gray-700 uppercase tracking-wide">Şirket Yetkilisi (Admin)</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[13px] font-medium text-gray-700 mb-1.5">Ad Soyad</label>
                     <input value={adminName} onChange={(e) => setAdminName(e.target.value)} placeholder="Ahmet Yılmaz" required className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
@@ -325,16 +325,16 @@ export default function UsersPage() {
 
       {/* ─── EDIT MODAL ─── */}
       {editOrg && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setEditOrg(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={() => setEditOrg(null)}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
               <h3 className="text-[16px] font-semibold text-gray-900 flex items-center gap-2">
                 <Pencil className="h-4 w-4 text-brand-600" /> Organizasyonu Düzenle
               </h3>
               <button onClick={() => setEditOrg(null)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><X className="h-5 w-5" /></button>
             </div>
-            <form onSubmit={handleEdit} className="p-6 space-y-5">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleEdit} className="p-4 sm:p-6 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Şirket Adı</label>
                   <input value={editOrg.name} onChange={(e) => setEditOrg({ ...editOrg, name: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
@@ -385,7 +385,7 @@ export default function UsersPage() {
                 <h4 className="text-[12px] font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
                   <Palette className="h-3.5 w-3.5" /> Marka Ayarları
                 </h4>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Ana Renk</label>
                     <div className="flex gap-2 items-center">
@@ -408,7 +408,7 @@ export default function UsersPage() {
               </div>
 
               {/* SLA */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-medium text-gray-500 mb-1.5">Onay SLA (gün)</label>
                   <input type="number" value={editOrg.slaAcknowledgeDays} onChange={(e) => setEditOrg({ ...editOrg, slaAcknowledgeDays: Number(e.target.value) })} className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500" />
@@ -432,8 +432,8 @@ export default function UsersPage() {
 
       {/* ─── DELETE CONFIRMATION MODAL ─── */}
       {deleteOrg && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => { setDeleteOrg(null); setDeleteConfirm(""); }}>
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={() => { setDeleteOrg(null); setDeleteConfirm(""); }}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 text-center">
               <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="h-7 w-7 text-red-500" />
@@ -483,7 +483,7 @@ export default function UsersPage() {
         ) : orgs.length === 0 ? (
           <div className="text-center py-16 text-gray-400 text-sm">Henüz organizasyon yok</div>
         ) : (
-          <table className="w-full data-table">
+          <div className="overflow-x-auto"><table className="w-full data-table min-w-[700px]">
             <thead>
               <tr>
                 <th>Organizasyon</th>
@@ -547,7 +547,7 @@ export default function UsersPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>

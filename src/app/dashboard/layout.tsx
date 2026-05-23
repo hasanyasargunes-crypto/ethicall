@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { SessionProvider } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -11,17 +12,35 @@ import {
   Users,
   LogOut,
   ClipboardList,
-  UserPlus,
   Inbox,
-  ChevronDown,
   Building2,
   ScrollText,
+  Menu,
+  X,
 } from "lucide-react";
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
 
   if (status === "loading") {
     return (
@@ -64,10 +83,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       ]
     : [];
 
-  const bottomNav = [
-    { href: "/dashboard/settings", label: "Hesap Ayarları", icon: ChevronDown },
-  ];
-
   function isActive(href: string, exact?: boolean) {
     if (exact) return pathname === href;
     return pathname === href || pathname.startsWith(href + "/");
@@ -75,10 +90,41 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex bg-[#f8f9fa]">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 z-40 flex items-center px-4 gap-3">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">E</span>
+          </div>
+          <span className="font-bold text-[15px] text-gray-900">EthicAll</span>
+        </Link>
+      </div>
+
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-[240px] bg-white border-r border-gray-100 flex flex-col fixed h-screen z-30">
+      <aside
+        className={`
+          w-[240px] bg-white border-r border-gray-100 flex flex-col fixed h-screen z-50
+          transition-transform duration-300 ease-in-out
+          lg:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
         {/* Logo */}
-        <div className="px-5 py-4 border-b border-gray-100">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">E</span>
@@ -87,6 +133,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               EthicAll
             </span>
           </Link>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Main Navigation */}
@@ -137,27 +189,21 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         {/* Bottom Section */}
         <div className="border-t border-gray-100 p-3 space-y-1">
           {/* Settings */}
-          {bottomNav.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`sidebar-item ${
-                  active ? "sidebar-item-active" : "sidebar-item-inactive"
-                }`}
-              >
-                <div className="w-[18px] h-[18px] rounded-full bg-brand-100 flex items-center justify-center">
-                  <span className="text-[9px] font-bold text-brand-700">⚙</span>
-                </div>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          <Link
+            href="/dashboard/settings"
+            className={`sidebar-item ${
+              isActive("/dashboard/settings") ? "sidebar-item-active" : "sidebar-item-inactive"
+            }`}
+          >
+            <div className="w-[18px] h-[18px] rounded-full bg-brand-100 flex items-center justify-center">
+              <span className="text-[9px] font-bold text-brand-700">⚙</span>
+            </div>
+            <span>Hesap Ayarları</span>
+          </Link>
 
           {/* User */}
           <div className="flex items-center gap-3 px-3 py-2.5 mt-1 rounded-lg bg-gray-50">
-            <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
               {userInitials}
             </div>
             <div className="flex-1 min-w-0">
@@ -170,7 +216,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/auth/login" })}
-              className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
               title="Çıkış Yap"
             >
               <LogOut className="h-4 w-4" />
@@ -180,8 +226,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-[240px] overflow-auto min-h-screen">
-        <div className="max-w-[1200px] mx-auto px-8 py-6">{children}</div>
+      <main className="flex-1 lg:ml-[240px] overflow-auto min-h-screen pt-14 lg:pt-0">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">{children}</div>
       </main>
     </div>
   );

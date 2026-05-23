@@ -80,7 +80,7 @@ export default function ReportsPage() {
       {/* Filters Bar */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-5">
         <div className="flex gap-3 flex-wrap items-center">
-          <div className="flex-1 min-w-[240px] relative">
+          <div className="flex-1 min-w-0 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
@@ -110,7 +110,8 @@ export default function ReportsPage() {
 
       {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <table className="w-full data-table">
+        <div className="overflow-x-auto">
+        <table className="w-full data-table min-w-[700px]">
           <thead>
             <tr>
               <th>Takip Kodu</th>
@@ -192,6 +193,7 @@ export default function ReportsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
