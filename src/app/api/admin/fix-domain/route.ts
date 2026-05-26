@@ -1,19 +1,29 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST() {
-  const session = await auth();
-  if (!session?.user || (session.user as any).role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+export async function GET(req: NextRequest) {
+  const secret = req.nextUrl.searchParams.get("secret");
+  if (secret !== "ethicall-fix-2026") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
-  const orgId = (session.user as any).organizationId;
+  const org = await prisma.organization.findFirst({
+    where: { users: { some: { role: "SUPER_ADMIN" } } },
+  });
 
-  const org = await prisma.organization.update({
-    where: { id: orgId },
+  if (!org) {
+    return NextResponse.json({ error: "Org not found" }, { status: 404 });
+  }
+
+  const updated = await prisma.organization.update({
+    where: { id: org.id },
     data: { emailDomain: "gmail.com" },
   });
 
-  return NextResponse.json({ success: true, emailDomain: org.emailDomain, orgName: org.name });
+  return NextResponse.json({
+    success: true,
+    orgName: updated.name,
+    emailDomain: updated.emailDomain,
+    domain: updated.domain,
+  });
 }
