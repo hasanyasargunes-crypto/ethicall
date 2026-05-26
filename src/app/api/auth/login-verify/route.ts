@@ -47,7 +47,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await sendLoginOtpEmail(email, code, user.name);
+    // Try sending email, but don't fail if it doesn't work
+    try {
+      await sendLoginOtpEmail(email, code, user.name);
+    } catch (emailErr) {
+      console.error("Login OTP email send failed:", emailErr);
+    }
+
+    // For TRIAL plan, return code in response (demo mode fallback)
+    if (user.organization.plan === "TRIAL") {
+      return NextResponse.json({ success: true, userName: user.name, demoCode: code });
+    }
 
     return NextResponse.json({ success: true, userName: user.name });
   } catch (err) {

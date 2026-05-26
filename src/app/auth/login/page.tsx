@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState("");
+  const [demoCode, setDemoCode] = useState("");
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   async function handleCredentials(e: React.FormEvent<HTMLFormElement>) {
@@ -38,6 +39,9 @@ export default function LoginPage() {
       }
 
       setUserName(data.userName || "");
+      if (data.demoCode) {
+        setDemoCode(data.demoCode);
+      }
       setStep("otp");
     } catch {
       setError("Bağlantı hatası");
@@ -114,6 +118,7 @@ export default function LoginPage() {
       } else {
         setError("");
         setOtp(["", "", "", "", "", ""]);
+        if (data.demoCode) setDemoCode(data.demoCode);
         otpRefs.current[0]?.focus();
       }
     } catch {
@@ -199,6 +204,12 @@ export default function LoginPage() {
                 <p className="text-[13px] text-gray-500 mt-1">
                   <strong>{email}</strong> adresine gönderilen 6 haneli kodu girin
                 </p>
+                {demoCode && (
+                  <div className="mt-3 p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-[12px] text-amber-700 font-medium">Demo Modu - Doğrulama Kodu:</p>
+                    <p className="text-lg font-bold text-amber-800 tracking-widest font-mono">{demoCode}</p>
+                  </div>
+                )}
               </div>
 
               <form onSubmit={handleOtpSubmit} className="space-y-4">
