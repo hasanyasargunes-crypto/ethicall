@@ -172,7 +172,31 @@ export async function sendLoginNotificationEmail(
   await sendEmail(email, "EthicAll - Yeni Giris Bildirimi", html);
 }
 
-// ─── 5. E-posta Degistirme Dogrulama Kodu ───────────────────────────────
+// ─── 5. Giris Dogrulama Kodu (2FA) ──────────────────────────────────────
+export async function sendLoginOtpEmail(
+  email: string,
+  code: string,
+  userName: string
+) {
+  if (!BREVO_API_KEY) {
+    console.log(`[DEV] Login OTP for ${email}: ${code}`);
+    return;
+  }
+
+  const html = emailWrapper(`
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Giris Dogrulama Kodu</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabiniza giris yapmak icin asagidaki kodu kullanin.</p>
+    <div style="background:#f0fdf4;border:2px solid #059669;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
+      <p style="margin:0;font-size:36px;font-weight:800;letter-spacing:10px;color:#059669;font-family:monospace;">${code}</p>
+    </div>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>5 dakika</strong> icerisinde gecerliligi yitirecektir.</p>
+    <p style="margin:0;font-size:13px;color:#6b7280;">Bu kodu siz talep etmediyseniz sifrenizi degistirmenizi oneririz.</p>
+  `);
+
+  await sendEmail(email, `EthicAll - Giris Dogrulama Kodunuz: ${code}`, html);
+}
+
+// ─── 6. E-posta Degistirme Dogrulama Kodu ───────────────────────────────
 export async function sendEmailChangeVerificationEmail(
   newEmail: string,
   code: string,

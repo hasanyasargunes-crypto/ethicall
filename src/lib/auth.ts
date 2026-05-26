@@ -10,12 +10,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        otp: { label: "OTP", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email || !credentials?.password || !credentials?.otp) return null;
 
         const email = credentials.email as string;
         const password = credentials.password as string;
+        const otp = credentials.otp as string;
 
         const user = await prisma.user.findFirst({
           where: { email },
@@ -27,7 +29,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isValid = await bcrypt.compare(password, user.passwordHash);
         if (!isValid) return null;
 
-        // Send login notification email (non-blocking)
+        const verification = await prisma.verificationCode.findFirst({
+          where: {
+            email,
+            code: otp,
+            orgSlug: "_login",
+            used: false,
+            expiresAt: { gte: new Date() },
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        if (!verification) return null;
+
+        await prisma.verificationCode.update({
+          where: { id: verification.id },
+          data: { used: true },
+        });
+
         sendLoginNotificationEmail(user.email, user.name).catch((err) =>
           console.error("Login notification email error:", err)
         );

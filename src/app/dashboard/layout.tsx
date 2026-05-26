@@ -226,8 +226,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-[240px] overflow-auto min-h-screen pt-14 lg:pt-0">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">{children}</div>
+      <main className="flex-1 md:ml-[240px] overflow-auto min-h-screen pt-14 md:pt-0">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">{children}</div>
       </main>
     </div>
   );
