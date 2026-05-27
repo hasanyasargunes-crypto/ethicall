@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       orgName, slug, domain, emailDomain, plan, billingPeriod,
-      adminName, adminEmail, adminPassword,
+      adminName, adminEmail, adminPassword, products,
     } = body;
 
     if (!orgName || !slug || !domain || !emailDomain || !plan || !adminName || !adminEmail || !adminPassword) {
@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
         domain,
         emailDomain,
         plan,
+        products: products && products.length > 0 ? products : ["ETHICS"],
         billingPeriod: billingPeriod || "MONTHLY",
         planStartDate,
         planEndDate,

@@ -46,6 +46,7 @@ export async function PUT(
     const {
       name, slug, domain, emailDomain, plan, billingPeriod,
       primaryColor, secondaryColor, logoUrl, slaAcknowledgeDays, slaResolveDays,
+      products,
     } = body;
 
     // Check org exists
@@ -97,6 +98,7 @@ export async function PUT(
         ...(logoUrl !== undefined && { logoUrl }),
         ...(slaAcknowledgeDays !== undefined && { slaAcknowledgeDays: Number(slaAcknowledgeDays) }),
         ...(slaResolveDays !== undefined && { slaResolveDays: Number(slaResolveDays) }),
+        ...(products !== undefined && { products }),
         ...planDates,
       },
       include: {
@@ -157,6 +159,22 @@ export async function DELETE(
 
     // 2. Delete reports
     await prisma.report.deleteMany({ where: { organizationId: id } });
+
+    // 2b. Delete KVKK data requests and related data
+    const drIds = await prisma.dataRequest.findMany({
+      where: { organizationId: id },
+      select: { id: true },
+    });
+    const dataRequestIds = drIds.map((d) => d.id);
+    if (dataRequestIds.length > 0) {
+      await prisma.dataRequestMessage.deleteMany({ where: { dataRequestId: { in: dataRequestIds } } });
+      await prisma.dataRequestAuditLog.deleteMany({ where: { dataRequestId: { in: dataRequestIds } } });
+      await prisma.dataRequestAttachment.deleteMany({ where: { dataRequestId: { in: dataRequestIds } } });
+    }
+    await prisma.dataRequest.deleteMany({ where: { organizationId: id } });
+    await prisma.dataRequestAuditLog.deleteMany({ where: { organizationId: id } });
+    await prisma.kVKKFormTemplate.deleteMany({ where: { organizationId: id } });
+    await prisma.responseTemplate.deleteMany({ where: { organizationId: id } });
 
     // 3. Delete form templates
     await prisma.formTemplate.deleteMany({ where: { organizationId: id } });

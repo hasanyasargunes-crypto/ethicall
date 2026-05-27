@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, Filter, Inbox } from "lucide-react";
+import { Search, Filter, Inbox, LayoutGrid, List } from "lucide-react";
+import KanbanBoard from "@/components/dashboard/KanbanBoard";
+import { REPORT_KANBAN_COLUMNS } from "@/lib/kvkk-constants";
+import type { KanbanItem } from "@/components/dashboard/KanbanBoard";
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; bg: string }> = {
   NEW: { label: "Yeni", dot: "bg-blue-500", bg: "bg-blue-50 text-blue-700" },
@@ -36,10 +40,12 @@ type Report = {
 };
 
 export default function ReportsPage() {
+  const router = useRouter();
   const [reports, setReports] = useState<Report[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
 
   useEffect(() => {
     fetch("/api/reports")
@@ -60,6 +66,28 @@ export default function ReportsPage() {
     return matchSearch && matchStatus;
   });
 
+  async function handleStatusChange(itemId: string, newStatus: string) {
+    const res = await fetch(`/api/reports/${itemId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    if (res.ok) {
+      setReports((prev) => prev.map((r) => (r.id === itemId ? { ...r, status: newStatus } : r)));
+    }
+  }
+
+  const kanbanItems: KanbanItem[] = filtered.map((r) => ({
+    id: r.id,
+    title: r.title.length > 50 ? r.title.slice(0, 50) + "..." : r.title,
+    subtitle: r.category.name_tr,
+    status: r.status,
+    badge: r.priority === "URGENT" || r.priority === "HIGH"
+      ? { label: PRIORITY_CONFIG[r.priority]?.label, color: r.priority === "URGENT" ? "bg-red-100 text-red-700" : "bg-orange-100 text-orange-700" }
+      : undefined,
+    meta: new Date(r.createdAt).toLocaleDateString("tr-TR"),
+  }));
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -70,11 +98,27 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="page-header">İhbarlar</h1>
-        <p className="page-subtitle">
-          {reports.length} ihbar bulundu
-        </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="page-header">İhbarlar</h1>
+          <p className="page-subtitle">{reports.length} ihbar bulundu</p>
+        </div>
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+          <button
+            onClick={() => setViewMode("list")}
+            className={`p-2 rounded-md transition-colors ${viewMode === "list" ? "bg-white shadow-sm text-brand-700" : "text-gray-500 hover:text-gray-700"}`}
+            title="Liste Görünümü"
+          >
+            <List className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("kanban")}
+            className={`p-2 rounded-md transition-colors ${viewMode === "kanban" ? "bg-white shadow-sm text-brand-700" : "text-gray-500 hover:text-gray-700"}`}
+            title="Kanban Görünümü"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Filters Bar */}
@@ -108,93 +152,105 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-        <table className="w-full data-table min-w-[700px]">
-          <thead>
-            <tr>
-              <th>Takip Kodu</th>
-              <th>Başlık</th>
-              <th>Kategori</th>
-              <th>Durum</th>
-              <th>Öncelik</th>
-              <th>Atanan</th>
-              <th>Tarih</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length === 0 ? (
+      {viewMode === "kanban" ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-4">
+          <KanbanBoard
+            columns={REPORT_KANBAN_COLUMNS}
+            items={kanbanItems}
+            onStatusChange={handleStatusChange}
+            onItemClick={(item) => router.push(`/dashboard/reports/${item.id}`)}
+            emptyText="Henüz ihbar yok"
+          />
+        </div>
+      ) : (
+        /* Table */
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="overflow-x-auto">
+          <table className="w-full data-table min-w-[700px]">
+            <thead>
               <tr>
-                <td colSpan={7}>
-                  <div className="text-center py-16">
-                    <Inbox className="h-12 w-12 text-gray-200 mx-auto mb-3" />
-                    <p className="text-sm text-gray-400">
-                      {reports.length === 0
-                        ? "Henüz ihbar yok"
-                        : "Sonuç bulunamadı"}
-                    </p>
-                  </div>
-                </td>
+                <th>Takip Kodu</th>
+                <th>Başlık</th>
+                <th>Kategori</th>
+                <th>Durum</th>
+                <th>Öncelik</th>
+                <th>Atanan</th>
+                <th>Tarih</th>
               </tr>
-            ) : (
-              filtered.map((report) => (
-                <tr key={report.id} className="cursor-pointer group">
-                  <td>
-                    <Link
-                      href={`/dashboard/reports/${report.id}`}
-                      className="font-mono text-[13px] text-brand-600 hover:text-brand-700 font-medium"
-                    >
-                      {report.trackingCode}
-                    </Link>
-                  </td>
-                  <td>
-                    <Link
-                      href={`/dashboard/reports/${report.id}`}
-                      className="text-[13px] text-gray-900 group-hover:text-brand-700 font-medium transition-colors"
-                    >
-                      {report.title}
-                    </Link>
-                  </td>
-                  <td className="text-[13px] text-gray-500">
-                    {report.category.name_tr}
-                  </td>
-                  <td>
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
-                        STATUS_CONFIG[report.status]?.bg
-                      }`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[report.status]?.dot}`}
-                      />
-                      {STATUS_CONFIG[report.status]?.label}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`text-[12px] font-semibold ${
-                        PRIORITY_CONFIG[report.priority]?.color
-                      }`}
-                    >
-                      {PRIORITY_CONFIG[report.priority]?.label}
-                    </span>
-                  </td>
-                  <td className="text-[13px] text-gray-500">
-                    {report.assignedTo?.name || (
-                      <span className="text-gray-300">—</span>
-                    )}
-                  </td>
-                  <td className="text-[13px] text-gray-400">
-                    {new Date(report.createdAt).toLocaleDateString("tr-TR")}
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7}>
+                    <div className="text-center py-16">
+                      <Inbox className="h-12 w-12 text-gray-200 mx-auto mb-3" />
+                      <p className="text-sm text-gray-400">
+                        {reports.length === 0
+                          ? "Henüz ihbar yok"
+                          : "Sonuç bulunamadı"}
+                      </p>
+                    </div>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filtered.map((report) => (
+                  <tr key={report.id} className="cursor-pointer group">
+                    <td>
+                      <Link
+                        href={`/dashboard/reports/${report.id}`}
+                        className="font-mono text-[13px] text-brand-600 hover:text-brand-700 font-medium"
+                      >
+                        {report.trackingCode}
+                      </Link>
+                    </td>
+                    <td>
+                      <Link
+                        href={`/dashboard/reports/${report.id}`}
+                        className="text-[13px] text-gray-900 group-hover:text-brand-700 font-medium transition-colors"
+                      >
+                        {report.title}
+                      </Link>
+                    </td>
+                    <td className="text-[13px] text-gray-500">
+                      {report.category.name_tr}
+                    </td>
+                    <td>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+                          STATUS_CONFIG[report.status]?.bg
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[report.status]?.dot}`}
+                        />
+                        {STATUS_CONFIG[report.status]?.label}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`text-[12px] font-semibold ${
+                          PRIORITY_CONFIG[report.priority]?.color
+                        }`}
+                      >
+                        {PRIORITY_CONFIG[report.priority]?.label}
+                      </span>
+                    </td>
+                    <td className="text-[13px] text-gray-500">
+                      {report.assignedTo?.name || (
+                        <span className="text-gray-300">—</span>
+                      )}
+                    </td>
+                    <td className="text-[13px] text-gray-400">
+                      {new Date(report.createdAt).toLocaleDateString("tr-TR")}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

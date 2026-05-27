@@ -18,20 +18,25 @@ model Organization {
   secondaryColor     String?        @default("#047857")
   fontFamily         String?        @default("Inter")
   plan               Plan           @default(TRIAL)
+  products           Product[]      @default([ETHICS])
   billingPeriod      BillingPeriod  @default(MONTHLY)
   planStartDate      DateTime?
   planEndDate        DateTime?
   locale             String         @default("tr")
   slaAcknowledgeDays Int            @default(7)
   slaResolveDays     Int            @default(90)
+  kvkkSlaResponseDays Int           @default(30)
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
-  reports       Report[]
-  users         User[]
-  categories    Category[]
-  formTemplates FormTemplate[]
-  teamInvites   TeamInvite[]
+  reports            Report[]
+  users              User[]
+  categories         Category[]
+  formTemplates      FormTemplate[]
+  teamInvites        TeamInvite[]
+  dataRequests       DataRequest[]
+  kvkkFormTemplates  KVKKFormTemplate[]
+  responseTemplates  ResponseTemplate[]
 }
 
 enum Plan {
@@ -39,6 +44,11 @@ enum Plan {
   ESSENTIAL
   SHIELD
   VAULT
+}
+
+enum Product {
+  ETHICS
+  KVKK
 }
 
 enum BillingPeriod {
@@ -61,9 +71,12 @@ model User {
   organization   Organization @relation(fields: [organizationId], references: [id])
   createdAt      DateTime     @default(now())
 
-  assignedReports Report[]  @relation("AssignedTo")
-  comments        Message[]
-  auditLogs       AuditLog[]
+  assignedReports      Report[]              @relation("AssignedTo")
+  comments             Message[]
+  auditLogs            AuditLog[]
+  assignedDataRequests DataRequest[]         @relation("KVKKAssignedTo")
+  kvkkMessages         DataRequestMessage[]  @relation("KVKKMessages")
+  kvkkAuditLogs        DataRequestAuditLog[] @relation("KVKKAuditLogs")
 
   @@unique([email, organizationId])
 }
@@ -240,4 +253,156 @@ model VerificationCode {
   createdAt DateTime @default(now())
 
   @@index([email, code])
+}
+
+// ─── KVKK İlgili Kişi Başvuruları ───
+
+model DataRequest {
+  id                 String            @id @default(cuid())
+  trackingCode       String            @unique
+  organizationId     String
+  organization       Organization      @relation(fields: [organizationId], references: [id])
+
+  applicantName       String
+  applicantSurname    String
+  applicantTCKN       String?
+  applicantPassport   String?
+  applicantNationality String?
+  applicantAddress    String           @db.Text
+  applicantEmail      String?
+  applicantPhone      String?
+  applicantFax        String?
+  applicantEmailVerified Boolean       @default(false)
+
+  isProxy             Boolean          @default(false)
+  proxyName           String?
+  proxyDocument       String?
+
+  rightType           KVKKRight
+  subject             String           @db.Text
+  description         String           @db.Text
+  formData            Json?
+
+  status              DataRequestStatus @default(NEW)
+  assignedToId        String?
+  assignedTo          User?            @relation("KVKKAssignedTo", fields: [assignedToId], references: [id])
+
+  responseContent     String?          @db.Text
+  responseDate        DateTime?
+  responseType        ResponseType?
+
+  slaDeadline         DateTime
+  slaWarning7         Boolean          @default(false)
+  slaWarning3         Boolean          @default(false)
+  slaWarning1         Boolean          @default(false)
+
+  pageCount           Int?
+  feeAmount           Float?
+  feePaid             Boolean          @default(false)
+
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  attachments         DataRequestAttachment[]
+  messages            DataRequestMessage[]
+  auditLogs           DataRequestAuditLog[]
+
+  @@index([organizationId, status])
+  @@index([trackingCode])
+}
+
+enum KVKKRight {
+  LEARN_IF_PROCESSED
+  REQUEST_INFO
+  LEARN_PURPOSE
+  LEARN_THIRD_PARTIES
+  REQUEST_CORRECTION
+  REQUEST_DELETION
+  NOTIFY_THIRD_PARTIES
+  OBJECT_AUTOMATED
+  CLAIM_DAMAGES
+}
+
+enum DataRequestStatus {
+  NEW
+  RECEIVED
+  IN_REVIEW
+  INFO_REQUESTED
+  PARTIALLY_APPROVED
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum ResponseType {
+  FULL_APPROVAL
+  PARTIAL_APPROVAL
+  REJECTION
+  INFO_REQUEST
+}
+
+model DataRequestAttachment {
+  id              String        @id @default(cuid())
+  dataRequestId   String
+  dataRequest     DataRequest   @relation(fields: [dataRequestId], references: [id])
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  uploadedBy      String
+  createdAt       DateTime      @default(now())
+}
+
+model DataRequestMessage {
+  id              String        @id @default(cuid())
+  dataRequestId   String
+  dataRequest     DataRequest   @relation(fields: [dataRequestId], references: [id])
+  content         String        @db.Text
+  senderType      SenderType
+  senderId        String?
+  sender          User?         @relation("KVKKMessages", fields: [senderId], references: [id])
+  isRead          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+}
+
+model DataRequestAuditLog {
+  id              String        @id @default(cuid())
+  dataRequestId   String?
+  dataRequest     DataRequest?  @relation(fields: [dataRequestId], references: [id])
+  userId          String?
+  user            User?         @relation("KVKKAuditLogs", fields: [userId], references: [id])
+  action          String
+  details         Json?
+  ipAddress       String?
+  organizationId  String
+  createdAt       DateTime      @default(now())
+
+  @@index([dataRequestId])
+  @@index([organizationId])
+}
+
+model KVKKFormTemplate {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  name            String        @default("KVKK Başvuru Formu")
+  fields          Json          @default("[]")
+  status          FormStatus    @default(DRAFT)
+  publicToken     String?       @unique
+  description     String?
+  locale          String        @default("tr")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+}
+
+model ResponseTemplate {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  name            String
+  type            ResponseType
+  content         String        @db.Text
+  isDefault       Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
 }
