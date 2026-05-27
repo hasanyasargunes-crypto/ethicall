@@ -176,6 +176,20 @@ export async function DELETE(
     await prisma.kVKKFormTemplate.deleteMany({ where: { organizationId: id } });
     await prisma.responseTemplate.deleteMany({ where: { organizationId: id } });
 
+    // 2c. Delete vendor compliance data
+    const vendorIds = await prisma.vendor.findMany({
+      where: { organizationId: id },
+      select: { id: true },
+    });
+    const vIds = vendorIds.map((v) => v.id);
+    if (vIds.length > 0) {
+      await prisma.complianceSurvey.deleteMany({ where: { vendorId: { in: vIds } } });
+      await prisma.vendorDocument.deleteMany({ where: { vendorId: { in: vIds } } });
+    }
+    await prisma.vendor.deleteMany({ where: { organizationId: id } });
+    await prisma.complianceSurveyTemplate.deleteMany({ where: { organizationId: id } });
+    await prisma.vendorAuditLog.deleteMany({ where: { organizationId: id } });
+
     // 3. Delete form templates
     await prisma.formTemplate.deleteMany({ where: { organizationId: id } });
 

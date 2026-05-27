@@ -22,6 +22,7 @@ import {
   FileCheck,
   MessageSquareText,
   ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
 
 type NavItem = {
@@ -107,7 +108,17 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     ],
   };
 
-  const sections = [ethicsNav, kvkkNav];
+  const vendorNav: NavSection = {
+    title: "Tedarikçi Uyum",
+    key: "vendor",
+    items: [
+      { href: "/dashboard/vendors", label: "Tedarikçiler", icon: Building2 },
+      { href: "/dashboard/vendors/surveys", label: "Anket Şablonları", icon: ClipboardList },
+      { href: "/dashboard/vendors/audit-log", label: "Denetim Kayıtları", icon: ScrollText },
+    ],
+  };
+
+  const sections = [ethicsNav, kvkkNav, vendorNav];
 
   const adminNav = isSuperAdmin
     ? [{ href: "/dashboard/users", label: "Organizasyonlar", icon: Building2 }]

@@ -37,6 +37,9 @@ model Organization {
   dataRequests       DataRequest[]
   kvkkFormTemplates  KVKKFormTemplate[]
   responseTemplates  ResponseTemplate[]
+  vendors            Vendor[]
+  surveyTemplates    ComplianceSurveyTemplate[]
+  vendorAuditLogs    VendorAuditLog[]
 }
 
 enum Plan {
@@ -49,6 +52,7 @@ enum Plan {
 enum Product {
   ETHICS
   KVKK
+  VENDOR_COMPLIANCE
 }
 
 enum BillingPeriod {
@@ -77,6 +81,7 @@ model User {
   assignedDataRequests DataRequest[]         @relation("KVKKAssignedTo")
   kvkkMessages         DataRequestMessage[]  @relation("KVKKMessages")
   kvkkAuditLogs        DataRequestAuditLog[] @relation("KVKKAuditLogs")
+  vendorAuditLogs      VendorAuditLog[]      @relation("VendorAuditUser")
 
   @@unique([email, organizationId])
 }
@@ -405,4 +410,129 @@ model ResponseTemplate {
   isDefault       Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @default(now()) @updatedAt
+}
+
+// ─── Tedarikçi Uyum Portalı (Vendor Compliance) ───
+
+model Vendor {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  companyName     String
+  taxId           String?
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+  address         String?       @db.Text
+  sector          String?
+  notes           String?       @db.Text
+  status          VendorStatus  @default(ACTIVE)
+  overallRiskScore Float?
+  riskLevel       RiskLevel?
+  portalToken     String        @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  surveys         ComplianceSurvey[]
+  documents       VendorDocument[]
+
+  @@index([organizationId, status])
+  @@index([portalToken])
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+  PENDING
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model ComplianceSurveyTemplate {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  name            String
+  description     String?       @db.Text
+  questions       Json          @default("[]")
+  isDefault       Boolean       @default(false)
+  category        String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+
+  surveys         ComplianceSurvey[]
+}
+
+model ComplianceSurvey {
+  id              String        @id @default(cuid())
+  vendorId        String
+  vendor          Vendor        @relation(fields: [vendorId], references: [id])
+  templateId      String
+  template        ComplianceSurveyTemplate @relation(fields: [templateId], references: [id])
+  status          SurveyStatus  @default(SENT)
+  accessToken     String        @unique
+  responses       Json?
+  riskScore       Float?
+  riskLevel       RiskLevel?
+  sentAt          DateTime      @default(now())
+  startedAt       DateTime?
+  completedAt     DateTime?
+  expiresAt       DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([vendorId])
+  @@index([accessToken])
+}
+
+enum SurveyStatus {
+  DRAFT
+  SENT
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+model VendorDocument {
+  id              String        @id @default(cuid())
+  vendorId        String
+  vendor          Vendor        @relation(fields: [vendorId], references: [id])
+  name            String
+  fileName        String
+  fileUrl         String
+  fileSize        Int
+  mimeType        String
+  documentType    String
+  issueDate       DateTime?
+  expiryDate      DateTime?
+  expiryWarning90 Boolean       @default(false)
+  expiryWarning30 Boolean       @default(false)
+  expiryWarning7  Boolean       @default(false)
+  uploadedBy      String
+  createdAt       DateTime      @default(now())
+
+  @@index([vendorId])
+  @@index([expiryDate])
+}
+
+model VendorAuditLog {
+  id              String        @id @default(cuid())
+  vendorId        String?
+  userId          String?
+  user            User?         @relation("VendorAuditUser", fields: [userId], references: [id])
+  action          String
+  details         Json?
+  ipAddress       String?
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  createdAt       DateTime      @default(now())
+
+  @@index([vendorId])
+  @@index([organizationId])
 }

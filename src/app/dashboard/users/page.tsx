@@ -39,6 +39,7 @@ const BILLING_PERIODS = [
 const PRODUCTS = [
   { value: "ETHICS", label: "Etik İhbar", icon: Shield, desc: "Anonim ihbar yönetimi" },
   { value: "KVKK", label: "KVKK Başvuruları", icon: UserCheck, desc: "İlgili kişi başvuru yönetimi" },
+  { value: "VENDOR_COMPLIANCE", label: "Tedarikçi Uyum", icon: Package, desc: "Tedarikçi risk ve uyum analizi" },
 ];
 
 type Org = {
@@ -581,10 +582,10 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-wrap">
                       {(org.products || ["ETHICS"]).map((p) => (
-                        <span key={p} className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${p === "ETHICS" ? "bg-brand-50 text-brand-700" : "bg-purple-50 text-purple-700"}`}>
-                          {p === "ETHICS" ? "Etik" : "KVKK"}
+                        <span key={p} className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold ${p === "ETHICS" ? "bg-brand-50 text-brand-700" : p === "KVKK" ? "bg-purple-50 text-purple-700" : "bg-amber-50 text-amber-700"}`}>
+                          {p === "ETHICS" ? "Etik" : p === "KVKK" ? "KVKK" : "Tedarikçi"}
                         </span>
                       ))}
                     </div>
