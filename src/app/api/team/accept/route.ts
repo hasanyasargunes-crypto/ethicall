@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     if (!token || !password || password.length < 8) {
       return NextResponse.json(
-        { error: "Token ve en az 8 karakter sifre zorunludur" },
+        { error: "Token ve en az 8 karakter şifre zorunludur" },
         { status: 400 }
       );
     }
@@ -20,15 +20,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (!invite) {
-      return NextResponse.json({ error: "Gecersiz davet linki" }, { status: 404 });
+      return NextResponse.json({ error: "Geçersiz davet linki" }, { status: 404 });
     }
 
     if (invite.acceptedAt) {
-      return NextResponse.json({ error: "Bu davet zaten kabul edilmis" }, { status: 400 });
+      return NextResponse.json({ error: "Bu davet zaten kabul edilmiş" }, { status: 400 });
     }
 
     if (invite.expiresAt < new Date()) {
-      return NextResponse.json({ error: "Bu davetin suresi dolmus" }, { status: 400 });
+      return NextResponse.json({ error: "Bu davetin süresi dolmuş" }, { status: 400 });
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -53,6 +53,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, organizationName: invite.organization.name });
   } catch (error) {
     console.error("Accept invite error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

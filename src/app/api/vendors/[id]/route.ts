@@ -25,7 +25,7 @@ export async function GET(
     },
   });
 
-  if (!vendor) return NextResponse.json({ error: "Tedarikci bulunamadi" }, { status: 404 });
+  if (!vendor) return NextResponse.json({ error: "Tedarikçi bulunamadı" }, { status: 404 });
 
   return NextResponse.json(vendor);
 }
@@ -47,7 +47,7 @@ export async function PUT(
     const { companyName, contactName, contactEmail, contactPhone, taxId, address, sector, notes, status } = body;
 
     const existing = await prisma.vendor.findFirst({ where: { id, organizationId: orgId } });
-    if (!existing) return NextResponse.json({ error: "Tedarikci bulunamadi" }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: "Tedarikçi bulunamadı" }, { status: 404 });
 
     const vendor = await prisma.vendor.update({
       where: { id },
@@ -79,7 +79,7 @@ export async function PUT(
     return NextResponse.json(vendor);
   } catch (error: any) {
     console.error("Update vendor error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }
 
@@ -96,7 +96,7 @@ export async function DELETE(
 
   try {
     const vendor = await prisma.vendor.findFirst({ where: { id, organizationId: orgId } });
-    if (!vendor) return NextResponse.json({ error: "Tedarikci bulunamadi" }, { status: 404 });
+    if (!vendor) return NextResponse.json({ error: "Tedarikçi bulunamadı" }, { status: 404 });
 
     // Delete related data
     await prisma.vendorDocument.deleteMany({ where: { vendorId: id } });
@@ -107,6 +107,6 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Delete vendor error:", error);
-    return NextResponse.json({ error: "Silme islemi basarisiz" }, { status: 500 });
+    return NextResponse.json({ error: "Silme işlemi başarısız" }, { status: 500 });
   }
 }

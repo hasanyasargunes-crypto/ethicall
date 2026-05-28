@@ -59,12 +59,12 @@ export default function SurveyTemplatesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Bu sablonu silmek istediginize emin misiniz?")) return;
+    if (!confirm("Bu şablonu silmek istediğinize emin misiniz?")) return;
     const res = await fetch(`/api/vendors/survey-templates/${id}`, { method: "DELETE" });
     if (res.ok) fetchTemplates();
     else {
       const data = await res.json();
-      alert(data.error || "Silme basarisiz");
+      alert(data.error || "Silme başarısız");
     }
   }
 
@@ -80,23 +80,23 @@ export default function SurveyTemplatesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Anket Sablonlari</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Tedarikci uyum anketlerini yonetin</p>
+          <h1 className="text-xl font-bold text-gray-900">Anket Şablonları</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Tedarikçi uyum anketlerini yönetin</p>
         </div>
         <button
           onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700"
         >
           <Plus className="h-4 w-4" />
-          Yeni Sablon
+          Yeni Şablon
         </button>
       </div>
 
       {templates.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <FileQuestion className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 mb-2">Henuz anket sablonu olusturulmamis</p>
-          <p className="text-xs text-gray-400">Varsayilan KVKK ve Bilgi Guvenligi anketi ile baslayin</p>
+          <p className="text-gray-500 mb-2">Henüz anket şablonu oluşturulmamış</p>
+          <p className="text-xs text-gray-400">Varsayılan KVKK ve Bilgi Güvenliği anketi ile başlayın</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -122,7 +122,7 @@ export default function SurveyTemplatesPage() {
               {t.description && <p className="text-sm text-gray-500 mb-3">{t.description}</p>}
               <div className="flex items-center gap-4 text-xs text-gray-400">
                 <span>{(t.questions as any[])?.length || 0} soru</span>
-                <span>{t._count.surveys} kez kullanildi</span>
+                <span>{t._count.surveys} kez kullanıldı</span>
                 {t.category && <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-500">{t.category}</span>}
               </div>
             </div>
@@ -136,22 +136,22 @@ export default function SurveyTemplatesPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-900">
-                {editingId ? "Sablonu Duzenle" : "Yeni Anket Sablonu"}
+                {editingId ? "Şablonu Düzenle" : "Yeni Anket Şablonu"}
               </h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sablon Adi *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Şablon Adı *</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="Ornegin: KVKK ve Bilgi Guvenligi Uyum Anketi"
+                  placeholder="Örneğin: KVKK ve Bilgi Güvenliği Uyum Anketi"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Aciklama</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -166,10 +166,10 @@ export default function SurveyTemplatesPage() {
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <option value="">Seciniz</option>
+                  <option value="">Seçiniz</option>
                   <option value="kvkk">KVKK Uyum</option>
-                  <option value="security">Bilgi Guvenligi</option>
-                  <option value="esg">ESG / Surdurulebilirlik</option>
+                  <option value="security">Bilgi Güvenliği</option>
+                  <option value="esg">ESG / Sürdürülebilirlik</option>
                   <option value="general">Genel Uyum</option>
                 </select>
               </div>
@@ -183,7 +183,7 @@ export default function SurveyTemplatesPage() {
                     className="rounded border-gray-300"
                   />
                   <label htmlFor="useDefault" className="text-sm text-brand-700">
-                    Varsayilan KVKK ve Bilgi Guvenligi sorularini kullan (15 soru)
+                    Varsayılan KVKK ve Bilgi Güvenliği sorularını kullan (15 soru)
                   </label>
                 </div>
               )}
@@ -195,11 +195,11 @@ export default function SurveyTemplatesPage() {
                   onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
                   className="rounded border-gray-300"
                 />
-                <label htmlFor="isDefault" className="text-sm text-gray-700">Varsayilan sablon olarak ayarla</label>
+                <label htmlFor="isDefault" className="text-sm text-gray-700">Varsayılan şablon olarak ayarla</label>
               </div>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600">Iptal</button>
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600">İptal</button>
               <button
                 onClick={handleSave}
                 disabled={saving || !form.name}

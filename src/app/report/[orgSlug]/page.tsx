@@ -440,7 +440,7 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                       />
                       <Paperclip className="h-6 w-6 mx-auto mb-2 text-gray-400" />
                       <p className="text-sm text-gray-500">
-                        Dosya eklemek icin tiklayin veya surekleyin
+                        Dosya eklemek için tıklayın veya sürükleyin
                       </p>
                       <p className="text-xs text-gray-400 mt-1">
                         PDF, resim, Word, Excel (maks. 10MB, en fazla 5 dosya)
@@ -480,8 +480,8 @@ export default function ReportPage({ params }: { params: Promise<{ orgSlug: stri
                     className="flex-1 text-white"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    {uploading ? "Dosyalar yukleniyor..." : loading ? "Gonderiliyor..." : (
-                      <>Ihbari Gonder <Send className="h-4 w-4 ml-2" /></>
+                    {uploading ? "Dosyalar yükleniyor..." : loading ? "Gönderiliyor..." : (
+                      <>İhbarı Gönder <Send className="h-4 w-4 ml-2" /></>
                     )}
                   </Button>
                 </div>

@@ -17,15 +17,15 @@ export async function POST(
 
   try {
     const { templateId, expiresInDays } = await req.json();
-    if (!templateId) return NextResponse.json({ error: "Anket sablonu secilmeli" }, { status: 400 });
+    if (!templateId) return NextResponse.json({ error: "Anket şablonu seçilmeli" }, { status: 400 });
 
     const vendor = await prisma.vendor.findFirst({ where: { id: vendorId, organizationId: orgId } });
-    if (!vendor) return NextResponse.json({ error: "Tedarikci bulunamadi" }, { status: 404 });
+    if (!vendor) return NextResponse.json({ error: "Tedarikçi bulunamadı" }, { status: 404 });
 
     const template = await prisma.complianceSurveyTemplate.findFirst({
       where: { id: templateId, organizationId: orgId },
     });
-    if (!template) return NextResponse.json({ error: "Sablon bulunamadi" }, { status: 404 });
+    if (!template) return NextResponse.json({ error: "Şablon bulunamadı" }, { status: 404 });
 
     const accessToken = uuid().replace(/-/g, "").substring(0, 32);
     const expiresAt = new Date();
@@ -58,6 +58,6 @@ export async function POST(
     return NextResponse.json(survey);
   } catch (error: any) {
     console.error("Assign survey error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

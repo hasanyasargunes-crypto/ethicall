@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { companyName, contactName, contactEmail, contactPhone, taxId, address, sector, notes } = body;
 
     if (!companyName || !contactName || !contactEmail) {
-      return NextResponse.json({ error: "Sirket adi, ilgili kisi ve e-posta zorunludur" }, { status: 400 });
+      return NextResponse.json({ error: "Şirket adı, ilgili kişi ve e-posta zorunludur" }, { status: 400 });
     }
 
     const portalToken = uuid().replace(/-/g, "").substring(0, 24);
@@ -74,6 +74,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(vendor);
   } catch (error: any) {
     console.error("Create vendor error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

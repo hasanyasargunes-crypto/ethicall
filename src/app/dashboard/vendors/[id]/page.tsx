@@ -106,7 +106,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
   }
 
   if (!vendor) {
-    return <div className="text-center py-20 text-gray-500">Tedarikci bulunamadi</div>;
+    return <div className="text-center py-20 text-gray-500">Tedarikçi bulunamadı</div>;
   }
 
   const statusConf = VENDOR_STATUS_CONFIG[vendor.status];
@@ -127,7 +127,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
     <div>
       {/* Back */}
       <Link href="/dashboard/vendors" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-4">
-        <ArrowLeft className="h-4 w-4" /> Tedarikciler
+        <ArrowLeft className="h-4 w-4" /> Tedarikçiler
       </Link>
 
       {/* Header */}
@@ -155,7 +155,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
             className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50"
           >
             <Copy className="h-4 w-4" />
-            {copied ? "Kopyalandi!" : "Portal Linki"}
+            {copied ? "Kopyalandı!" : "Portal Linki"}
           </button>
           <button
             onClick={() => setShowAssignModal(true)}
@@ -176,20 +176,20 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
               <RiskIcon className={`h-10 w-10 mb-2 ${riskConf.color}`} />
               <p className="text-3xl font-bold text-gray-900">%{vendor.overallRiskScore}</p>
               <p className={`text-sm font-medium ${riskConf.color}`}>{riskConf.label}</p>
-              <p className="text-xs text-gray-400 mt-1">Uyum Puani</p>
+              <p className="text-xs text-gray-400 mt-1">Uyum Puanı</p>
             </>
           ) : (
             <>
               <ShieldAlert className="h-10 w-10 mb-2 text-gray-300" />
-              <p className="text-sm text-gray-400">Henuz puanlanmadi</p>
-              <p className="text-xs text-gray-400">Anket atayarak puanlayin</p>
+              <p className="text-sm text-gray-400">Henüz puanlanmadı</p>
+              <p className="text-xs text-gray-400">Anket atayarak puanlayın</p>
             </>
           )}
         </div>
 
         {/* Contact Info */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 md:col-span-2">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">Iletisim Bilgileri</h3>
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">İletişim Bilgileri</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 text-gray-600">
               <Mail className="h-4 w-4 text-gray-400" />
@@ -201,7 +201,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
                 {vendor.contactPhone}
               </div>
             )}
-            <div className="text-gray-600"><span className="text-gray-400">Ilgili Kisi:</span> {vendor.contactName}</div>
+            <div className="text-gray-600"><span className="text-gray-400">İlgili Kişi:</span> {vendor.contactName}</div>
             {vendor.taxId && <div className="text-gray-600"><span className="text-gray-400">Vergi No:</span> {vendor.taxId}</div>}
             {vendor.address && <div className="text-gray-600 col-span-2"><span className="text-gray-400">Adres:</span> {vendor.address}</div>}
           </div>
@@ -220,8 +220,8 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
           <div className="flex items-center gap-2 text-amber-700">
             <AlertTriangle className="h-5 w-5" />
             <span className="font-medium text-sm">
-              {expiredDocs.length > 0 && `${expiredDocs.length} belgenin suresi dolmus. `}
-              {expiringDocs.length > 0 && `${expiringDocs.length} belgenin suresi dolmak uzere.`}
+              {expiredDocs.length > 0 && `${expiredDocs.length} belgenin süresi dolmuş. `}
+              {expiringDocs.length > 0 && `${expiringDocs.length} belgenin süresi dolmak üzere.`}
             </span>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
           <span className="text-xs text-gray-400">{vendor.surveys.length} anket</span>
         </div>
         {vendor.surveys.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 text-sm">Henuz anket atanmamis</div>
+          <div className="p-8 text-center text-gray-400 text-sm">Henüz anket atanmamış</div>
         ) : (
           <div className="divide-y divide-gray-50">
             {vendor.surveys.map((s) => {
@@ -244,8 +244,8 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
                   <div>
                     <p className="text-sm font-medium text-gray-900">{s.template.name}</p>
                     <p className="text-xs text-gray-400">
-                      Gonderildi: {new Date(s.sentAt).toLocaleDateString("tr-TR")}
-                      {s.completedAt && ` | Tamamlandi: ${new Date(s.completedAt).toLocaleDateString("tr-TR")}`}
+                      Gönderildi: {new Date(s.sentAt).toLocaleDateString("tr-TR")}
+                      {s.completedAt && ` | Tamamlandı: ${new Date(s.completedAt).toLocaleDateString("tr-TR")}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -271,7 +271,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
           <span className="text-xs text-gray-400">{vendor.documents.length} belge</span>
         </div>
         {vendor.documents.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 text-sm">Henuz belge yuklenmemis</div>
+          <div className="p-8 text-center text-gray-400 text-sm">Henüz belge yüklenmemiş</div>
         ) : (
           <div className="divide-y divide-gray-50">
             {vendor.documents.map((d) => {
@@ -291,7 +291,7 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
                     {d.expiryDate && (
                       <span className={`text-xs ${isExpired ? "text-red-600 font-medium" : isExpiring ? "text-amber-600" : "text-gray-400"}`}>
                         <CalendarClock className="h-3.5 w-3.5 inline mr-1" />
-                        {isExpired ? "Suresi dolmus" : new Date(d.expiryDate).toLocaleDateString("tr-TR")}
+                        {isExpired ? "Süresi dolmuş" : new Date(d.expiryDate).toLocaleDateString("tr-TR")}
                       </span>
                     )}
                   </div>
@@ -308,18 +308,18 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-lg font-bold text-gray-900">Anket Ata</h2>
-              <p className="text-sm text-gray-500 mt-1">{vendor.companyName} icin anket secin</p>
+              <p className="text-sm text-gray-500 mt-1">{vendor.companyName} için anket seçin</p>
             </div>
             <div className="p-6">
               {templates.length === 0 ? (
-                <p className="text-sm text-gray-400">Once bir anket sablonu olusturun.</p>
+                <p className="text-sm text-gray-400">Önce bir anket şablonu oluşturun.</p>
               ) : (
                 <select
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value)}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <option value="">Sablon seciniz</option>
+                  <option value="">Şablon seçiniz</option>
                   {templates.map((t: any) => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
@@ -327,13 +327,13 @@ export default function VendorDetailPage({ params }: { params: Promise<{ id: str
               )}
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setShowAssignModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600">Iptal</button>
+              <button onClick={() => setShowAssignModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600">İptal</button>
               <button
                 onClick={assignSurvey}
                 disabled={assigning || !selectedTemplate}
                 className="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50"
               >
-                {assigning ? "Ataniyor..." : "Anket Gonder"}
+                {assigning ? "Atanıyor..." : "Anket Gönder"}
               </button>
             </div>
           </div>

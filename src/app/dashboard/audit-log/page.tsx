@@ -32,16 +32,16 @@ type Pagination = {
 };
 
 const ACTION_LABELS: Record<string, { label: string; color: string; icon: string }> = {
-  "report.created": { label: "Ihbar Olusturuldu", color: "bg-green-50 text-green-700 border-green-200", icon: "+" },
-  "report.status_changed": { label: "Durum Degistirildi", color: "bg-blue-50 text-blue-700 border-blue-200", icon: "↻" },
-  "report.assigned": { label: "Atama Yapildi", color: "bg-purple-50 text-purple-700 border-purple-200", icon: "→" },
-  "report.acknowledged": { label: "Onaylandi", color: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: "✓" },
-  "report.resolved": { label: "Cozuldu", color: "bg-green-50 text-green-700 border-green-200", icon: "✓✓" },
-  "report.closed": { label: "Kapatildi", color: "bg-gray-50 text-gray-700 border-gray-200", icon: "✕" },
-  "message.sent": { label: "Mesaj Gonderildi", color: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: "✉" },
-  "attachment.uploaded": { label: "Belge Yuklendi", color: "bg-orange-50 text-orange-700 border-orange-200", icon: "📎" },
-  "user.login": { label: "Giris Yapildi", color: "bg-cyan-50 text-cyan-700 border-cyan-200", icon: "🔑" },
-  "user.password_changed": { label: "Sifre Degistirildi", color: "bg-red-50 text-red-700 border-red-200", icon: "🔒" },
+  "report.created": { label: "İhbar Oluşturuldu", color: "bg-green-50 text-green-700 border-green-200", icon: "+" },
+  "report.status_changed": { label: "Durum Değiştirildi", color: "bg-blue-50 text-blue-700 border-blue-200", icon: "↻" },
+  "report.assigned": { label: "Atama Yapıldı", color: "bg-purple-50 text-purple-700 border-purple-200", icon: "→" },
+  "report.acknowledged": { label: "Onaylandı", color: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: "✓" },
+  "report.resolved": { label: "Çözüldü", color: "bg-green-50 text-green-700 border-green-200", icon: "✓✓" },
+  "report.closed": { label: "Kapatıldı", color: "bg-gray-50 text-gray-700 border-gray-200", icon: "✕" },
+  "message.sent": { label: "Mesaj Gönderildi", color: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: "✉" },
+  "attachment.uploaded": { label: "Belge Yüklendi", color: "bg-orange-50 text-orange-700 border-orange-200", icon: "📎" },
+  "user.login": { label: "Giriş Yapıldı", color: "bg-cyan-50 text-cyan-700 border-cyan-200", icon: "🔑" },
+  "user.password_changed": { label: "Şifre Değiştirildi", color: "bg-red-50 text-red-700 border-red-200", icon: "🔒" },
 };
 
 function getActionInfo(action: string) {
@@ -135,10 +135,10 @@ export default function AuditLogPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <Shield className="h-5 w-5 text-brand-600" />
-          <h1 className="page-header">Denetim Kayitlari</h1>
+          <h1 className="page-header">Denetim Kayıtları</h1>
         </div>
         <p className="page-subtitle">
-          Tum basvuru ve islem gecmisi. Bu kayitlar degistirilemez ve silinemez.
+          Tüm başvuru ve işlem geçmişi. Bu kayıtlar değiştirilemez ve silinemez.
         </p>
       </div>
 
@@ -146,10 +146,10 @@ export default function AuditLogPage() {
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
         <ScrollText className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
         <div>
-          <p className="text-[13px] font-medium text-amber-800">Degistirilemez Kayit Sistemi</p>
+          <p className="text-[13px] font-medium text-amber-800">Değiştirilemez Kayıt Sistemi</p>
           <p className="text-[12px] text-amber-600 mt-0.5">
-            Bu bolum tum ihbar, inceleme ve islem gecmisini kronolojik olarak gosterir.
-            Kayitlar yasal uyumluluk icin korunur ve herhangi bir degisiklik yapilamaz.
+            Bu bölüm tüm ihbar, inceleme ve işlem geçmişini kronolojik olarak gösterir.
+            Kayıtlar yasal uyumluluk için korunur ve herhangi bir değişiklik yapılamaz.
           </p>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function AuditLogPage() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Takip kodu, kullanici veya islem ara..."
+              placeholder="Takip kodu, kullanıcı veya işlem ara..."
               className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
             />
           </div>
@@ -173,7 +173,7 @@ export default function AuditLogPage() {
               onChange={(e) => setActionFilter(e.target.value)}
               className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
             >
-              <option value="">Tum Islemler</option>
+              <option value="">Tüm İşlemler</option>
               {Object.entries(ACTION_LABELS).map(([key, { label }]) => (
                 <option key={key} value={key}>{label}</option>
               ))}
@@ -184,7 +184,7 @@ export default function AuditLogPage() {
 
       {/* Stats */}
       <div className="flex items-center gap-4 mb-4 text-[13px] text-gray-500">
-        <span>Toplam {pagination.total} kayit</span>
+        <span>Toplam {pagination.total} kayıt</span>
         <span>|</span>
         <span>Sayfa {pagination.page} / {pagination.totalPages || 1}</span>
       </div>
@@ -198,7 +198,7 @@ export default function AuditLogPage() {
         ) : filteredLogs.length === 0 ? (
           <div className="text-center py-20">
             <ScrollText className="h-12 w-12 text-gray-200 mx-auto mb-3" />
-            <p className="text-sm text-gray-400">Henuz kayit bulunmuyor.</p>
+            <p className="text-sm text-gray-400">Henüz kayıt bulunmuyor.</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-50">
@@ -281,7 +281,7 @@ export default function AuditLogPage() {
               disabled={pagination.page <= 1}
               className="flex items-center gap-1 px-3 py-1.5 text-[13px] text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="h-4 w-4" /> Onceki
+              <ChevronLeft className="h-4 w-4" /> Önceki
             </button>
             <span className="text-[13px] text-gray-500">
               {(pagination.page - 1) * pagination.limit + 1} -{" "}

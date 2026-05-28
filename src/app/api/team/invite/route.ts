@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
     const organizationId = (session.user as any).organizationId;
 
     if (!email || !name || !role) {
-      return NextResponse.json({ error: "Tum alanlar zorunludur" }, { status: 400 });
+      return NextResponse.json({ error: "Tüm alanlar zorunludur" }, { status: 400 });
     }
 
     if (!["ADMIN", "MANAGER", "REVIEWER"].includes(role)) {
-      return NextResponse.json({ error: "Gecersiz rol" }, { status: 400 });
+      return NextResponse.json({ error: "Geçersiz rol" }, { status: 400 });
     }
 
     // Get organization to validate email domain
@@ -33,14 +33,14 @@ export async function POST(req: NextRequest) {
       where: { id: organizationId },
     });
     if (!org) {
-      return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+      return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
     }
 
     // Validate email domain matches organization
     const emailDomain = email.split("@")[1];
     if (emailDomain !== org.domain) {
       return NextResponse.json(
-        { error: `E-posta adresi sirket domainle eslesmiyor (${org.domain})` },
+        { error: `E-posta adresi şirket domainle eşleşmiyor (${org.domain})` },
         { status: 400 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       where: { email, organizationId },
     });
     if (existingUser) {
-      return NextResponse.json({ error: "Bu e-posta zaten kayitli" }, { status: 400 });
+      return NextResponse.json({ error: "Bu e-posta zaten kayıtlı" }, { status: 400 });
     }
 
     // Check for existing pending invite
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       where: { email, organizationId, acceptedAt: null, expiresAt: { gte: new Date() } },
     });
     if (existingInvite) {
-      return NextResponse.json({ error: "Bu e-posta icin zaten bekleyen bir davet var" }, { status: 400 });
+      return NextResponse.json({ error: "Bu e-posta için zaten bekleyen bir davet var" }, { status: 400 });
     }
 
     const token = uuidv4();
@@ -81,6 +81,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, invite });
   } catch (error) {
     console.error("Invite error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

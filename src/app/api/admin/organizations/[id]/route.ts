@@ -23,7 +23,7 @@ export async function GET(
   });
 
   if (!org) {
-    return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
   }
 
   return NextResponse.json(org);
@@ -52,14 +52,14 @@ export async function PUT(
     // Check org exists
     const existing = await prisma.organization.findUnique({ where: { id } });
     if (!existing) {
-      return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+      return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
     }
 
     // Check slug uniqueness if changed
     if (slug && slug !== existing.slug) {
       const slugTaken = await prisma.organization.findUnique({ where: { slug } });
       if (slugTaken) {
-        return NextResponse.json({ error: "Bu slug zaten kullanilmakta" }, { status: 400 });
+        return NextResponse.json({ error: "Bu slug zaten kullanılmakta" }, { status: 400 });
       }
     }
 
@@ -67,7 +67,7 @@ export async function PUT(
     if (domain && domain !== existing.domain) {
       const domainTaken = await prisma.organization.findUnique({ where: { domain } });
       if (domainTaken) {
-        return NextResponse.json({ error: "Bu domain zaten kullanilmakta" }, { status: 400 });
+        return NextResponse.json({ error: "Bu domain zaten kullanılmakta" }, { status: 400 });
       }
     }
 
@@ -110,9 +110,9 @@ export async function PUT(
   } catch (error: any) {
     console.error("Update org error:", error);
     if (error?.code === "P2002") {
-      return NextResponse.json({ error: "Bu kayit zaten mevcut (unique constraint)" }, { status: 400 });
+      return NextResponse.json({ error: "Bu kayıt zaten mevcut (unique constraint)" }, { status: 400 });
     }
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }
 
@@ -135,7 +135,7 @@ export async function DELETE(
     });
 
     if (!org) {
-      return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+      return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
     }
 
     // Prevent deleting the platform org
@@ -219,6 +219,6 @@ export async function DELETE(
     return NextResponse.json({ success: true, deletedOrg: org.name });
   } catch (error: any) {
     console.error("Delete org error:", error);
-    return NextResponse.json({ error: "Silme islemi basarisiz: " + (error?.message || "") }, { status: 500 });
+    return NextResponse.json({ error: "Silme işlemi başarısız: " + (error?.message || "") }, { status: 500 });
   }
 }

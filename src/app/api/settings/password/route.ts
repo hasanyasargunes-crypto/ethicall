@@ -15,23 +15,23 @@ export async function POST(req: NextRequest) {
   const { currentPassword, newPassword } = body;
 
   if (!currentPassword || !newPassword) {
-    return NextResponse.json({ error: "Tum alanlar zorunludur" }, { status: 400 });
+    return NextResponse.json({ error: "Tüm alanlar zorunludur" }, { status: 400 });
   }
 
   if (newPassword.length < 8) {
-    return NextResponse.json({ error: "Sifre en az 8 karakter olmalidir" }, { status: 400 });
+    return NextResponse.json({ error: "Şifre en az 8 karakter olmalıdır" }, { status: 400 });
   }
 
   // Get current user
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
-    return NextResponse.json({ error: "Kullanici bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Kullanıcı bulunamadı" }, { status: 404 });
   }
 
   // Verify current password
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) {
-    return NextResponse.json({ error: "Mevcut sifre hatali" }, { status: 400 });
+    return NextResponse.json({ error: "Mevcut şifre hatalı" }, { status: 400 });
   }
 
   // Hash and update

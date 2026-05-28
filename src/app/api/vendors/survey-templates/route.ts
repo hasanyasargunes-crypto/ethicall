@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, description, questions, category, isDefault, useDefaultQuestions } = body;
 
-    if (!name) return NextResponse.json({ error: "Sablon adi zorunludur" }, { status: 400 });
+    if (!name) return NextResponse.json({ error: "Şablon adı zorunludur" }, { status: 400 });
 
     // If useDefaultQuestions, load default KVKK & Security questions
     const templateQuestions = useDefaultQuestions ? DEFAULT_SURVEY_QUESTIONS : (questions || []);
@@ -57,6 +57,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(template);
   } catch (error: any) {
     console.error("Create template error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

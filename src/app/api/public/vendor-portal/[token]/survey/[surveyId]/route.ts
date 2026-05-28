@@ -14,17 +14,17 @@ export async function POST(
       where: { portalToken: token },
       select: { id: true, organizationId: true },
     });
-    if (!vendor) return NextResponse.json({ error: "Portal bulunamadi" }, { status: 404 });
+    if (!vendor) return NextResponse.json({ error: "Portal bulunamadı" }, { status: 404 });
 
     const survey = await prisma.complianceSurvey.findFirst({
       where: { id: surveyId, vendorId: vendor.id, status: { in: ["SENT", "IN_PROGRESS"] } },
       include: { template: true },
     });
-    if (!survey) return NextResponse.json({ error: "Anket bulunamadi" }, { status: 404 });
+    if (!survey) return NextResponse.json({ error: "Anket bulunamadı" }, { status: 404 });
 
     if (survey.expiresAt < new Date()) {
       await prisma.complianceSurvey.update({ where: { id: surveyId }, data: { status: "EXPIRED" } });
-      return NextResponse.json({ error: "Anketin suresi dolmus" }, { status: 400 });
+      return NextResponse.json({ error: "Anketin süresi dolmuş" }, { status: 400 });
     }
 
     const { responses } = await req.json();
@@ -80,6 +80,6 @@ export async function POST(
     return NextResponse.json({ success: true, riskScore: score, riskLevel: level });
   } catch (error: any) {
     console.error("Submit survey error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

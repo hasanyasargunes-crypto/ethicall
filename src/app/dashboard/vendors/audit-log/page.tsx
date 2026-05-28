@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { ScrollText, User } from "lucide-react";
 
 const ACTION_LABELS: Record<string, string> = {
-  VENDOR_CREATED: "Tedarikci eklendi",
-  VENDOR_UPDATED: "Tedarikci guncellendi",
-  VENDOR_STATUS_CHANGED: "Tedarikci durumu degisti",
-  VENDOR_DELETED: "Tedarikci silindi",
-  SURVEY_ASSIGNED: "Anket atandi",
-  SURVEY_COMPLETED: "Anket tamamlandi",
-  DOCUMENT_UPLOADED: "Belge yuklendi",
-  DOCUMENT_EXPIRED: "Belge suresi doldu",
+  VENDOR_CREATED: "Tedarikçi eklendi",
+  VENDOR_UPDATED: "Tedarikçi güncellendi",
+  VENDOR_STATUS_CHANGED: "Tedarikçi durumu değişti",
+  VENDOR_DELETED: "Tedarikçi silindi",
+  SURVEY_ASSIGNED: "Anket atandı",
+  SURVEY_COMPLETED: "Anket tamamlandı",
+  DOCUMENT_UPLOADED: "Belge yüklendi",
+  DOCUMENT_EXPIRED: "Belge süresi doldu",
 };
 
 export default function VendorAuditLogPage() {
@@ -36,14 +36,14 @@ export default function VendorAuditLogPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">Tedarikci Denetim Kayitlari</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Tedarikci modulu islem gecmisi</p>
+        <h1 className="text-xl font-bold text-gray-900">Tedarikçi Denetim Kayıtları</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Tedarikçi modülü işlem geçmişi</p>
       </div>
 
       {logs.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <ScrollText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Henuz kayit yok</p>
+          <p className="text-gray-500">Henüz kayıt yok</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -52,8 +52,8 @@ export default function VendorAuditLogPage() {
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Tarih</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">Islem</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Kullanici</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">İşlem</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Kullanıcı</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Detay</th>
                 </tr>
               </thead>

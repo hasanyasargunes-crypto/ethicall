@@ -38,7 +38,7 @@ export async function GET(
   });
 
   if (!vendor || vendor.status === "BLOCKED") {
-    return NextResponse.json({ error: "Portal bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Portal bulunamadı" }, { status: 404 });
   }
 
   return NextResponse.json(vendor);

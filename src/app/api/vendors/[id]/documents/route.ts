@@ -14,7 +14,7 @@ export async function GET(
   const orgId = (session.user as any).organizationId;
 
   const vendor = await prisma.vendor.findFirst({ where: { id: vendorId, organizationId: orgId } });
-  if (!vendor) return NextResponse.json({ error: "Tedarikci bulunamadi" }, { status: 404 });
+  if (!vendor) return NextResponse.json({ error: "Tedarikçi bulunamadı" }, { status: 404 });
 
   const documents = await prisma.vendorDocument.findMany({
     where: { vendorId },

@@ -27,7 +27,7 @@ export async function PUT(
     where: { id: categoryId, organizationId },
   });
   if (!category) {
-    return NextResponse.json({ error: "Kategori bulunamadi" }, { status: 404 });
+    return NextResponse.json({ error: "Kategori bulunamadı" }, { status: 404 });
   }
 
   // Check if existing template has a publicToken

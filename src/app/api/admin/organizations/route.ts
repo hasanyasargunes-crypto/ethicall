@@ -35,18 +35,18 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!orgName || !slug || !domain || !emailDomain || !plan || !adminName || !adminEmail || !adminPassword) {
-      return NextResponse.json({ error: "Tum alanlar zorunludur" }, { status: 400 });
+      return NextResponse.json({ error: "Tüm alanlar zorunludur" }, { status: 400 });
     }
 
     const existing = await prisma.organization.findUnique({ where: { slug } });
     if (existing) {
-      return NextResponse.json({ error: "Bu slug zaten kullanilmakta" }, { status: 400 });
+      return NextResponse.json({ error: "Bu slug zaten kullanılmakta" }, { status: 400 });
     }
 
     const adminEmailDomain = adminEmail.split("@")[1];
     if (adminEmailDomain !== emailDomain) {
       return NextResponse.json(
-        { error: "Admin e-posta adresi belirtilen mail uzantisi ile eslesmiyor" },
+        { error: "Admin e-posta adresi belirtilen mail uzantısı ile eşleşmiyor" },
         { status: 400 }
       );
     }
@@ -91,13 +91,13 @@ export async function POST(req: NextRequest) {
           createMany: {
             data: [
               { name_tr: "Finansal Suistimal", name_en: "Financial Fraud", icon: "Banknote", sortOrder: 0 },
-              { name_tr: "Yolsuzluk ve Rusvet", name_en: "Corruption & Bribery", icon: "Scale", sortOrder: 1 },
-              { name_tr: "Is Sagligi ve Guvenligi", name_en: "Workplace Safety", icon: "HardHat", sortOrder: 2 },
-              { name_tr: "Ayrimcilik ve Taciz", name_en: "Discrimination & Harassment", icon: "ShieldAlert", sortOrder: 3 },
-              { name_tr: "Cikar Catismasi", name_en: "Conflict of Interest", icon: "Swords", sortOrder: 4 },
-              { name_tr: "Veri Gizliligi Ihlali", name_en: "Data Privacy Breach", icon: "Lock", sortOrder: 5 },
-              { name_tr: "Cevresel Ihlal", name_en: "Environmental Violation", icon: "TreePine", sortOrder: 6 },
-              { name_tr: "Diger", name_en: "Other", icon: "MoreHorizontal", sortOrder: 7 },
+              { name_tr: "Yolsuzluk ve Rüşvet", name_en: "Corruption & Bribery", icon: "Scale", sortOrder: 1 },
+              { name_tr: "İş Sağlığı ve Güvenliği", name_en: "Workplace Safety", icon: "HardHat", sortOrder: 2 },
+              { name_tr: "Ayrımcılık ve Taciz", name_en: "Discrimination & Harassment", icon: "ShieldAlert", sortOrder: 3 },
+              { name_tr: "Çıkar Çatışması", name_en: "Conflict of Interest", icon: "Swords", sortOrder: 4 },
+              { name_tr: "Veri Gizliliği İhlali", name_en: "Data Privacy Breach", icon: "Lock", sortOrder: 5 },
+              { name_tr: "Çevresel İhlal", name_en: "Environmental Violation", icon: "TreePine", sortOrder: 6 },
+              { name_tr: "Diğer", name_en: "Other", icon: "MoreHorizontal", sortOrder: 7 },
             ],
           },
         },
@@ -124,6 +124,6 @@ export async function POST(req: NextRequest) {
       }
       return NextResponse.json({ error: "Bu kayıt zaten mevcut" }, { status: 400 });
     }
-    return NextResponse.json({ error: "Sunucu hatasi: " + (error?.message || "Bilinmeyen hata") }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası: " + (error?.message || "Bilinmeyen hata") }, { status: 500 });
   }
 }

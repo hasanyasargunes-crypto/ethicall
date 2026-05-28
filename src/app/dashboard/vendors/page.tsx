@@ -63,7 +63,7 @@ export default function VendorsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Bu tedarikciyi silmek istediginize emin misiniz?")) return;
+    if (!confirm("Bu tedarikçiyi silmek istediğinize emin misiniz?")) return;
     await fetch(`/api/vendors/${id}`, { method: "DELETE" });
     fetchVendors();
   }
@@ -77,7 +77,7 @@ export default function VendorsPage() {
 
   function RiskBadge({ score, level }: { score: number | null; level: string | null }) {
     if (score === null || !level) {
-      return <span className="text-xs text-gray-400">Puanlanmadi</span>;
+      return <span className="text-xs text-gray-400">Puanlanmadı</span>;
     }
     const config = RISK_LEVEL_CONFIG[level];
     const Icon = riskIcons[level] || ShieldAlert;
@@ -103,15 +103,15 @@ export default function VendorsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Tedarikciler</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{vendors.length} tedarikci kayitli</p>
+          <h1 className="text-xl font-bold text-gray-900">Tedarikçiler</h1>
+          <p className="text-sm text-gray-500 mt-0.5">{vendors.length} tedarikçi kayıtlı</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Tedarikci Ekle
+          Tedarikçi Ekle
         </button>
       </div>
 
@@ -120,7 +120,7 @@ export default function VendorsPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
         <input
           type="text"
-          placeholder="Tedarikci ara..."
+          placeholder="Tedarikçi ara..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
@@ -132,8 +132,8 @@ export default function VendorsPage() {
         {[
           { label: "Toplam", value: vendors.length, color: "text-gray-900" },
           { label: "Aktif", value: vendors.filter((v) => v.status === "ACTIVE").length, color: "text-emerald-600" },
-          { label: "Dusuk Risk", value: vendors.filter((v) => v.riskLevel === "LOW").length, color: "text-emerald-600" },
-          { label: "Yuksek Risk", value: vendors.filter((v) => v.riskLevel === "HIGH" || v.riskLevel === "CRITICAL").length, color: "text-red-600" },
+          { label: "Düşük Risk", value: vendors.filter((v) => v.riskLevel === "LOW").length, color: "text-emerald-600" },
+          { label: "Yüksek Risk", value: vendors.filter((v) => v.riskLevel === "HIGH" || v.riskLevel === "CRITICAL").length, color: "text-red-600" },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-xl border border-gray-100 p-4">
             <p className="text-xs text-gray-500">{s.label}</p>
@@ -146,7 +146,7 @@ export default function VendorsPage() {
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
           <Building2 className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Henuz tedarikci eklenmemis</p>
+          <p className="text-gray-500">Henüz tedarikçi eklenmemiş</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -154,9 +154,9 @@ export default function VendorsPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">Sirket</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Ilgili Kisi</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Sektor</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Şirket</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">İlgili Kişi</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Sektör</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Risk Skoru</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">Durum</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Anket</th>
@@ -223,22 +223,22 @@ export default function VendorsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">Yeni Tedarikci Ekle</h2>
+              <h2 className="text-lg font-bold text-gray-900">Yeni Tedarikçi Ekle</h2>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sirket Adi *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Şirket Adı *</label>
                 <input
                   type="text"
                   value={form.companyName}
                   onChange={(e) => setForm({ ...form, companyName: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  placeholder="Ornegin: X Lojistik A.S."
+                  placeholder="Örneğin: X Lojistik A.Ş."
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Ilgili Kisi *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">İlgili Kişi *</label>
                   <input
                     type="text"
                     value={form.contactName}
@@ -278,14 +278,14 @@ export default function VendorsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Sektor</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sektör</label>
                 <select
                   value={form.sector}
                   onChange={(e) => setForm({ ...form, sector: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
-                  <option value="">Seciniz</option>
-                  {["Teknoloji","Lojistik","Uretim","Finans","Saglik","Insaat","Enerji","Perakende","Gida","Danismanlik","Hukuk","Egitim","Medya","Diger"].map((s) => (
+                  <option value="">Seçiniz</option>
+                  {["Teknoloji","Lojistik","Üretim","Finans","Sağlık","İnşaat","Enerji","Perakende","Gıda","Danışmanlık","Hukuk","Eğitim","Medya","Diğer"].map((s) => (
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
@@ -296,14 +296,14 @@ export default function VendorsPage() {
                 onClick={() => setShowAddModal(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
               >
-                Iptal
+                İptal
               </button>
               <button
                 onClick={handleAdd}
                 disabled={saving || !form.companyName || !form.contactName || !form.contactEmail}
                 className="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50"
               >
-                {saving ? "Ekleniyor..." : "Tedarikci Ekle"}
+                {saving ? "Ekleniyor..." : "Tedarikçi Ekle"}
               </button>
             </div>
           </div>

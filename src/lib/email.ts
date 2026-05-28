@@ -31,7 +31,7 @@ async function sendEmail(to: string, subject: string, htmlContent: string) {
   if (!res.ok) {
     const err = await res.text();
     console.error("Brevo email error:", err);
-    throw new Error(`Email gonderimi basarisiz: ${res.status}`);
+    throw new Error(`E-posta gönderilemedi: ${res.status}`);
   }
 }
 
@@ -54,15 +54,15 @@ function emailWrapper(content: string, orgName?: string) {
     </div>
     <!-- Footer -->
     <div style="padding:16px 32px;background:#f8f9fa;border-top:1px solid #e5e7eb;text-align:center;">
-      <p style="margin:0;font-size:11px;color:#9ca3af;">EthicAll - Anonim Etik Ihbar Platformu</p>
-      <p style="margin:4px 0 0;font-size:11px;color:#9ca3af;">Bu otomatik bir bildirimdir, lutfen yanit vermeyin.</p>
+      <p style="margin:0;font-size:11px;color:#9ca3af;">EthicAll - Anonim Etik İhbar Platformu</p>
+      <p style="margin:4px 0 0;font-size:11px;color:#9ca3af;">Bu otomatik bir bildirimdir, lütfen yanıt vermeyin.</p>
     </div>
   </div>
 </body>
 </html>`;
 }
 
-// ─── 1. Ihbar Formu - Dogrulama Kodu ────────────────────────────────────
+// ─── 1. İhbar Formu - Doğrulama Kodu ────────────────────────────────────
 export async function sendVerificationEmail(
   email: string,
   code: string,
@@ -74,19 +74,19 @@ export async function sendVerificationEmail(
   }
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Dogrulama Kodunuz</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Ihbar formunu doldurmak icin asagidaki kodu kullanin.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Doğrulama Kodunuz</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">İhbar formunu doldurmak için aşağıdaki kodu kullanın.</p>
     <div style="background:#f0fdf4;border:2px solid #059669;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
       <p style="margin:0;font-size:36px;font-weight:800;letter-spacing:10px;color:#059669;font-family:monospace;">${code}</p>
     </div>
-    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>10 dakika</strong> icerisinde gecerliligi yitirecektir.</p>
-    <p style="margin:0;font-size:13px;color:#6b7280;">Bu kodu siz talep etmediyseniz bu e-postayi goz ardi edebilirsiniz.</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>10 dakika</strong> içerisinde geçerliliğini yitirecektir.</p>
+    <p style="margin:0;font-size:13px;color:#6b7280;">Bu kodu siz talep etmediyseniz bu e-postayı göz ardı edebilirsiniz.</p>
   `, orgName);
 
-  await sendEmail(email, `${orgName} - Dogrulama Kodunuz: ${code}`, html);
+  await sendEmail(email, `${orgName} - Doğrulama Kodunuz: ${code}`, html);
 }
 
-// ─── 2. Ekip Uyesi Davet Maili ──────────────────────────────────────────
+// ─── 2. Ekip Üyesi Davet Maili ──────────────────────────────────────────
 export async function sendTeamInviteEmail(
   email: string,
   name: string,
@@ -107,14 +107,14 @@ export async function sendTeamInviteEmail(
     <div style="text-align:center;margin:0 0 24px;">
       <a href="${inviteUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:14px 40px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">Daveti Kabul Et</a>
     </div>
-    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu davet <strong>7 gun</strong> icerisinde gecerliligi yitirecektir.</p>
-    <p style="margin:0;font-size:12px;color:#9ca3af;word-break:break-all;">Link calismiyorsa: ${inviteUrl}</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu davet <strong>7 gün</strong> içerisinde geçerliliğini yitirecektir.</p>
+    <p style="margin:0;font-size:12px;color:#9ca3af;word-break:break-all;">Link çalışmıyorsa: ${inviteUrl}</p>
   `, orgName);
 
   await sendEmail(email, `${orgName} - Ekip Davetiyesi`, html);
 }
 
-// ─── 3. Sifre Degistirme Bildirimi ──────────────────────────────────────
+// ─── 3. Şifre Değiştirme Bildirimi ──────────────────────────────────────
 export async function sendPasswordChangedEmail(
   email: string,
   userName: string
@@ -127,8 +127,8 @@ export async function sendPasswordChangedEmail(
   const now = new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" });
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Sifreniz Degistirildi</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabinizin sifresi basariyla degistirildi.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Şifreniz Değiştirildi</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabınızın şifresi başarıyla değiştirildi.</p>
     <div style="background:#f9fafb;border-radius:8px;padding:16px;margin:0 0 24px;">
       <table style="width:100%;font-size:13px;color:#374151;">
         <tr><td style="padding:4px 0;color:#6b7280;">Tarih:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${now}</td></tr>
@@ -136,14 +136,14 @@ export async function sendPasswordChangedEmail(
       </table>
     </div>
     <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin:0 0 16px;">
-      <p style="margin:0;font-size:13px;color:#92400e;">Bu islem siz tarafindan yapilmadiysa hemen hesabinizi guvenlik altina alin ve yoneticinize bildirin.</p>
+      <p style="margin:0;font-size:13px;color:#92400e;">Bu işlem siz tarafından yapılmadıysa hemen hesabınızı güvenlik altına alın ve yöneticinize bildirin.</p>
     </div>
   `);
 
-  await sendEmail(email, "EthicAll - Sifreniz Degistirildi", html);
+  await sendEmail(email, "EthicAll - Şifreniz Değiştirildi", html);
 }
 
-// ─── 4. Giris Bildirimi ─────────────────────────────────────────────────
+// ─── 4. Giriş Bildirimi ─────────────────────────────────────────────────
 export async function sendLoginNotificationEmail(
   email: string,
   userName: string,
@@ -157,8 +157,8 @@ export async function sendLoginNotificationEmail(
   const now = new Date().toLocaleString("tr-TR", { timeZone: "Europe/Istanbul" });
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Yeni Giris Algilandi</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabiniza yeni bir giris yapildi.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Yeni Giriş Algılandı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabınıza yeni bir giriş yapıldı.</p>
     <div style="background:#f9fafb;border-radius:8px;padding:16px;margin:0 0 24px;">
       <table style="width:100%;font-size:13px;color:#374151;">
         <tr><td style="padding:4px 0;color:#6b7280;">Tarih:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${now}</td></tr>
@@ -166,13 +166,13 @@ export async function sendLoginNotificationEmail(
         ${ipAddress ? `<tr><td style="padding:4px 0;color:#6b7280;">IP Adresi:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${ipAddress}</td></tr>` : ""}
       </table>
     </div>
-    <p style="margin:0;font-size:13px;color:#6b7280;">Bu giris siz tarafindan yapilmadiysa lutfen sifrenizi hemen degistirin.</p>
+    <p style="margin:0;font-size:13px;color:#6b7280;">Bu giriş siz tarafından yapılmadıysa lütfen şifrenizi hemen değiştirin.</p>
   `);
 
-  await sendEmail(email, "EthicAll - Yeni Giris Bildirimi", html);
+  await sendEmail(email, "EthicAll - Yeni Giriş Bildirimi", html);
 }
 
-// ─── 5. Giris Dogrulama Kodu (2FA) ──────────────────────────────────────
+// ─── 5. Giriş Doğrulama Kodu (2FA) ──────────────────────────────────────
 export async function sendLoginOtpEmail(
   email: string,
   code: string,
@@ -184,19 +184,19 @@ export async function sendLoginOtpEmail(
   }
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Giris Dogrulama Kodu</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabiniza giris yapmak icin asagidaki kodu kullanin.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Giriş Doğrulama Kodu</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, hesabınıza giriş yapmak için aşağıdaki kodu kullanın.</p>
     <div style="background:#f0fdf4;border:2px solid #059669;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
       <p style="margin:0;font-size:36px;font-weight:800;letter-spacing:10px;color:#059669;font-family:monospace;">${code}</p>
     </div>
-    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>5 dakika</strong> icerisinde gecerliligi yitirecektir.</p>
-    <p style="margin:0;font-size:13px;color:#6b7280;">Bu kodu siz talep etmediyseniz sifrenizi degistirmenizi oneririz.</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>5 dakika</strong> içerisinde geçerliliğini yitirecektir.</p>
+    <p style="margin:0;font-size:13px;color:#6b7280;">Bu kodu siz talep etmediyseniz şifrenizi değiştirmenizi öneririz.</p>
   `);
 
-  await sendEmail(email, `EthicAll - Giris Dogrulama Kodunuz: ${code}`, html);
+  await sendEmail(email, `EthicAll - Giriş Doğrulama Kodunuz: ${code}`, html);
 }
 
-// ─── 6. E-posta Degistirme Dogrulama Kodu ───────────────────────────────
+// ─── 6. E-posta Değiştirme Doğrulama Kodu ───────────────────────────────
 export async function sendEmailChangeVerificationEmail(
   newEmail: string,
   code: string,
@@ -208,19 +208,19 @@ export async function sendEmailChangeVerificationEmail(
   }
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">E-posta Degisikligi Dogrulama</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, e-posta adresinizi degistirmek icin asagidaki kodu kullanin.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">E-posta Değişikliği Doğrulama</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${userName}, e-posta adresinizi değiştirmek için aşağıdaki kodu kullanın.</p>
     <div style="background:#f0fdf4;border:2px solid #059669;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
       <p style="margin:0;font-size:36px;font-weight:800;letter-spacing:10px;color:#059669;font-family:monospace;">${code}</p>
     </div>
-    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>10 dakika</strong> icerisinde gecerliligi yitirecektir.</p>
-    <p style="margin:0;font-size:13px;color:#6b7280;">Bu istegi siz yapmadiyseniz bu e-postayi goz ardi edin.</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Bu kod <strong>10 dakika</strong> içerisinde geçerliliğini yitirecektir.</p>
+    <p style="margin:0;font-size:13px;color:#6b7280;">Bu isteği siz yapmadıysanız bu e-postayı göz ardı edin.</p>
   `);
 
-  await sendEmail(newEmail, "EthicAll - E-posta Degisikligi Dogrulamasi", html);
+  await sendEmail(newEmail, "EthicAll - E-posta Değişikliği Doğrulaması", html);
 }
 
-// ─── 6. Ihbar Alindi Bildirimi (ihbarciya) ──────────────────────────────
+// ─── 7. İhbar Alındı Bildirimi (ihbarcıya) ──────────────────────────────
 export async function sendReportConfirmationEmail(
   email: string,
   trackingCode: string,
@@ -234,24 +234,24 @@ export async function sendReportConfirmationEmail(
   const trackUrl = `${APP_URL}/report/track`;
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Ihbariniz Alindi</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Ihbariniz basariyla iletildi. Asagidaki takip kodu ile ihbarinizin durumunu sorgulayabilirsiniz.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">İhbarınız Alındı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">İhbarınız başarıyla iletildi. Aşağıdaki takip kodu ile ihbarınızın durumunu sorgulayabilirsiniz.</p>
     <div style="background:#f0fdf4;border:2px solid #059669;border-radius:12px;padding:24px;text-align:center;margin:0 0 24px;">
       <p style="margin:0 0 4px;font-size:12px;color:#6b7280;">Takip Kodunuz</p>
       <p style="margin:0;font-size:28px;font-weight:800;letter-spacing:4px;color:#059669;font-family:monospace;">${trackingCode}</p>
     </div>
     <div style="text-align:center;margin:0 0 24px;">
-      <a href="${trackUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Ihbarimi Takip Et</a>
+      <a href="${trackUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">İhbarımı Takip Et</a>
     </div>
     <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;">
-      <p style="margin:0;font-size:13px;color:#92400e;">Bu kodu guvenli bir yerde saklayin. Kimliginiz tamamen gizli tutulmaktadir.</p>
+      <p style="margin:0;font-size:13px;color:#92400e;">Bu kodu güvenli bir yerde saklayın. Kimliğiniz tamamen gizli tutulmaktadır.</p>
     </div>
   `, orgName);
 
-  await sendEmail(email, `${orgName} - Ihbariniz Alindi (${trackingCode})`, html);
+  await sendEmail(email, `${orgName} - İhbarınız Alındı (${trackingCode})`, html);
 }
 
-// ─── 7. Yeni Ihbar Bildirimi (yoneticilere) ─────────────────────────────
+// ─── 8. Yeni İhbar Bildirimi (yöneticilere) ─────────────────────────────
 export async function sendNewReportNotificationEmail(
   email: string,
   managerName: string,
@@ -266,9 +266,9 @@ export async function sendNewReportNotificationEmail(
   }
 
   const severityLabels: Record<string, string> = {
-    LOW: "Dusuk",
+    LOW: "Düşük",
     MEDIUM: "Orta",
-    HIGH: "Yuksek",
+    HIGH: "Yüksek",
     CRITICAL: "Kritik",
   };
   const severityColors: Record<string, string> = {
@@ -281,19 +281,19 @@ export async function sendNewReportNotificationEmail(
   const dashUrl = `${APP_URL}/dashboard/reports`;
 
   const html = emailWrapper(`
-    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Yeni Ihbar Bildirildi</h2>
-    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${managerName}, yeni bir etik ihbar alindi.</p>
+    <h2 style="margin:0 0 8px;font-size:18px;color:#111827;">Yeni İhbar Bildirildi</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#6b7280;">Merhaba ${managerName}, yeni bir etik ihbar alındı.</p>
     <div style="background:#f9fafb;border-radius:8px;padding:16px;margin:0 0 24px;">
       <table style="width:100%;font-size:13px;color:#374151;">
-        <tr><td style="padding:4px 0;color:#6b7280;">Baslik:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${reportTitle}</td></tr>
+        <tr><td style="padding:4px 0;color:#6b7280;">Başlık:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${reportTitle}</td></tr>
         <tr><td style="padding:4px 0;color:#6b7280;">Kategori:</td><td style="padding:4px 0;text-align:right;font-weight:600;">${category}</td></tr>
         <tr><td style="padding:4px 0;color:#6b7280;">Ciddiyet:</td><td style="padding:4px 0;text-align:right;font-weight:600;color:${severityColors[severity] || "#6b7280"};">${severityLabels[severity] || severity}</td></tr>
       </table>
     </div>
     <div style="text-align:center;margin:0 0 16px;">
-      <a href="${dashUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Panelde Incele</a>
+      <a href="${dashUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:12px 32px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Panelde İncele</a>
     </div>
   `, orgName);
 
-  await sendEmail(email, `${orgName} - Yeni Ihbar: ${reportTitle}`, html);
+  await sendEmail(email, `${orgName} - Yeni İhbar: ${reportTitle}`, html);
 }

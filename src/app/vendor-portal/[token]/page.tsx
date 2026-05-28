@@ -36,7 +36,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
     fetch(`/api/public/vendor-portal/${token}`)
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then(setData)
-      .catch(() => setError("Portal bulunamadi"))
+      .catch(() => setError("Portal bulunamadı"))
       .finally(() => setLoading(false));
   }, [token]);
 
@@ -52,7 +52,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
       setSubmitted(result);
       setActiveSurvey(null);
     } else {
-      alert(result.error || "Gonderme basarisiz");
+      alert(result.error || "Gönderme başarısız");
     }
     setSubmitting(false);
   }
@@ -70,7 +70,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-3" />
-          <p className="text-gray-600">{error || "Portal bulunamadi"}</p>
+          <p className="text-gray-600">{error || "Portal bulunamadı"}</p>
         </div>
       </div>
     );
@@ -84,10 +84,10 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-md w-full text-center">
           <CheckCircle2 className="h-16 w-16 mx-auto mb-4" style={{ color: brandColor }} />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Anket Tamamlandi</h1>
-          <p className="text-gray-500 mb-4">Cevalariniz basariyla kaydedildi. Tesekkur ederiz.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Anket Tamamlandı</h1>
+          <p className="text-gray-500 mb-4">Cevaplarınız başarıyla kaydedildi. Teşekkür ederiz.</p>
           <div className="bg-gray-50 rounded-xl p-4">
-            <p className="text-sm text-gray-500">Uyum Puaniniz</p>
+            <p className="text-sm text-gray-500">Uyum Puanınız</p>
             <p className="text-4xl font-bold mt-1" style={{ color: brandColor }}>%{submitted.score}</p>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
                   <div className="flex gap-3">
                     {[
                       { value: "yes", label: "Evet" },
-                      { value: "no", label: "Hayir" },
+                      { value: "no", label: "Hayır" },
                     ].map((opt) => (
                       <button
                         key={opt.value}
@@ -184,7 +184,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
           {/* Progress */}
           <div className="mt-6 bg-white rounded-xl border border-gray-100 p-4">
             <div className="flex justify-between text-xs text-gray-500 mb-2">
-              <span>Ilerleme</span>
+              <span>İlerleme</span>
               <span>{Object.keys(responses).length} / {questions.length}</span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -203,7 +203,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
               onClick={() => { setActiveSurvey(null); setResponses({}); }}
               className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
             >
-              Geri Don
+              Geri Dön
             </button>
             <button
               onClick={() => handleSubmit(activeSurvey)}
@@ -211,7 +211,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
               className="px-6 py-2.5 text-white text-sm font-medium rounded-lg disabled:opacity-50"
               style={{ backgroundColor: brandColor }}
             >
-              {submitting ? "Gonderiliyor..." : "Anketi Gonder"}
+              {submitting ? "Gönderiliyor..." : "Anketi Gönder"}
             </button>
           </div>
         </main>
@@ -230,7 +230,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
             </div>
             <div>
               <p className="font-bold text-gray-900">{data.organization.name}</p>
-              <p className="text-sm text-gray-500">Tedarikci Uyum Portali</p>
+              <p className="text-sm text-gray-500">Tedarikçi Uyum Portalı</p>
             </div>
           </div>
           <div className="bg-gray-50 rounded-xl p-4">
@@ -251,7 +251,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
           <div>
             <h2 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
               <ClipboardList className="h-4 w-4" style={{ color: brandColor }} />
-              Doldurulmasi Gereken Anketler
+              Doldurulması Gereken Anketler
             </h2>
             <div className="space-y-3">
               {data.surveys.map((s) => (
@@ -277,8 +277,8 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
         {data.surveys.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-8 text-center">
             <ShieldCheck className="h-12 w-12 mx-auto mb-3" style={{ color: brandColor }} />
-            <p className="text-gray-600 font-medium">Tum anketler tamamlandi</p>
-            <p className="text-sm text-gray-400 mt-1">Su anda bekleyen bir anketiniz bulunmamakta</p>
+            <p className="text-gray-600 font-medium">Tüm anketler tamamlandı</p>
+            <p className="text-sm text-gray-400 mt-1">Şu anda bekleyen bir anketiniz bulunmamakta</p>
           </div>
         )}
 
@@ -287,7 +287,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
           <div>
             <h2 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
               <FileText className="h-4 w-4" style={{ color: brandColor }} />
-              Yuklu Belgeler
+              Yüklü Belgeler
             </h2>
             <div className="bg-white rounded-xl border border-gray-100 divide-y divide-gray-50">
               {data.documents.map((d) => (
@@ -309,7 +309,7 @@ export default function VendorPortalPage({ params }: { params: Promise<{ token: 
       </main>
 
       <footer className="text-center py-6 text-xs text-gray-400">
-        EthicAll Tedarikci Uyum Portali
+        EthicAll Tedarikçi Uyum Portalı
       </footer>
     </div>
   );

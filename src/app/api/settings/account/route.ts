@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
 
     // Send verification email via Brevo
-    await sendEmailChangeVerificationEmail(newEmail, code, user?.name || "Kullanici");
+    await sendEmailChangeVerificationEmail(newEmail, code, user?.name || "Kullanıcı");
 
     // In dev/demo mode, also return the code in response
     const isDev = !process.env.BREVO_API_KEY;
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!verification) {
-      return NextResponse.json({ error: "Gecersiz veya suresi dolmus kod" }, { status: 400 });
+      return NextResponse.json({ error: "Geçersiz veya süresi dolmuş kod" }, { status: 400 });
     }
 
     // Mark code as used
@@ -81,5 +81,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
-  return NextResponse.json({ error: "Gecersiz islem" }, { status: 400 });
+  return NextResponse.json({ error: "Geçersiz işlem" }, { status: 400 });
 }

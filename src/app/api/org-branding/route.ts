@@ -23,11 +23,11 @@ export async function GET(req: NextRequest) {
     });
 
     if (!org) {
-      return NextResponse.json({ error: "Organizasyon bulunamadi" }, { status: 404 });
+      return NextResponse.json({ error: "Organizasyon bulunamadı" }, { status: 404 });
     }
 
     return NextResponse.json(org);
   } catch {
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }

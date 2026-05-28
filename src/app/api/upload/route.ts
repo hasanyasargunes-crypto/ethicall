@@ -28,16 +28,16 @@ export async function POST(req: NextRequest) {
     const trackingCode = formData.get("trackingCode") as string | null;
 
     if (!file) {
-      return NextResponse.json({ error: "Dosya bulunamadi" }, { status: 400 });
+      return NextResponse.json({ error: "Dosya bulunamadı" }, { status: 400 });
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: "Dosya boyutu 10MB'yi asamaz" }, { status: 400 });
+      return NextResponse.json({ error: "Dosya boyutu 10MB'yi aşamaz" }, { status: 400 });
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: "Desteklenmeyen dosya tipi. Izin verilen: resim, PDF, Word, Excel, metin dosyalari" },
+        { error: "Desteklenmeyen dosya tipi. İzin verilen: resim, PDF, Word, Excel, metin dosyaları" },
         { status: 400 }
       );
     }
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!report) {
-      return NextResponse.json({ error: "Ihbar bulunamadi" }, { status: 404 });
+      return NextResponse.json({ error: "İhbar bulunamadı" }, { status: 404 });
     }
 
     // Generate unique filename
@@ -96,6 +96,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Upload error:", error);
-    return NextResponse.json({ error: "Dosya yuklenirken hata olustu" }, { status: 500 });
+    return NextResponse.json({ error: "Dosya yüklenirken hata oluştu" }, { status: 500 });
   }
 }

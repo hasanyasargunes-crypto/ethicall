@@ -20,7 +20,7 @@ export async function PUT(
     const existing = await prisma.complianceSurveyTemplate.findFirst({
       where: { id, organizationId: orgId },
     });
-    if (!existing) return NextResponse.json({ error: "Sablon bulunamadi" }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: "Şablon bulunamadı" }, { status: 404 });
 
     if (isDefault) {
       await prisma.complianceSurveyTemplate.updateMany({
@@ -43,7 +43,7 @@ export async function PUT(
     return NextResponse.json(template);
   } catch (error: any) {
     console.error("Update template error:", error);
-    return NextResponse.json({ error: "Sunucu hatasi" }, { status: 500 });
+    return NextResponse.json({ error: "Sunucu hatası" }, { status: 500 });
   }
 }
 
@@ -63,15 +63,15 @@ export async function DELETE(
       where: { id, organizationId: orgId },
       include: { _count: { select: { surveys: true } } },
     });
-    if (!existing) return NextResponse.json({ error: "Sablon bulunamadi" }, { status: 404 });
+    if (!existing) return NextResponse.json({ error: "Şablon bulunamadı" }, { status: 404 });
     if (existing._count.surveys > 0) {
-      return NextResponse.json({ error: "Bu sablon kullanilmakta, silinemez" }, { status: 400 });
+      return NextResponse.json({ error: "Bu şablon kullanılmakta, silinemez" }, { status: 400 });
     }
 
     await prisma.complianceSurveyTemplate.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("Delete template error:", error);
-    return NextResponse.json({ error: "Silme basarisiz" }, { status: 500 });
+    return NextResponse.json({ error: "Silme başarısız" }, { status: 500 });
   }
 }
