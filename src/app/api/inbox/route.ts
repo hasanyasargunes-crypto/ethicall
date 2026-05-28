@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 // GET: list messages grouped by report for the user's org
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const organizationId = (session.user as any).organizationId;
+  const organizationId = ctx.organizationId;
   const url = new URL(req.url);
   const filter = url.searchParams.get("filter") || "all"; // all, unread, reporter, staff
   const search = url.searchParams.get("search") || "";

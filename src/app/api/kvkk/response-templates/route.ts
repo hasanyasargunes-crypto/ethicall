@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const templates = await prisma.responseTemplate.findMany({
       where: { organizationId: orgId },
       orderBy: { updatedAt: "desc" },
@@ -23,12 +23,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const { name, type, content, isDefault } = await req.json();
 
     if (!name || !type || !content) {
@@ -61,12 +61,12 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const { id, name, type, content, isDefault } = await req.json();
 
     if (!id) {
@@ -101,12 +101,12 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
     const { id } = await params;
-    const orgId = (session.user as any).organizationId;
-    const userId = (session.user as any).id;
+    const orgId = ctx.organizationId;
+    const userId = ctx.userId;
     const { content } = await req.json();
 
     if (!content?.trim()) {

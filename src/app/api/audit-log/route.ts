@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 // GET: List audit logs for the organization (read-only)
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const userRole = (session.user as any).role;
-  if (!["ADMIN", "SUPER_ADMIN", "MANAGER"].includes(userRole)) {
+  if (!["ADMIN", "SUPER_ADMIN", "MANAGER"].includes(ctx.role)) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
   }
 
-  const organizationId = (session.user as any).organizationId;
-  const isSuperAdmin = userRole === "SUPER_ADMIN";
+  const organizationId = ctx.organizationId;
+  const isSuperAdmin = ctx.role === "SUPER_ADMIN" && !ctx.impersonating;
 
   const url = req.nextUrl;
   const page = parseInt(url.searchParams.get("page") || "1");

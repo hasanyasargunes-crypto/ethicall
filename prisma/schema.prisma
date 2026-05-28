@@ -26,6 +26,7 @@ model Organization {
   slaAcknowledgeDays Int            @default(7)
   slaResolveDays     Int            @default(90)
   kvkkSlaResponseDays Int           @default(30)
+  allowSupportAccess Boolean        @default(true)
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 

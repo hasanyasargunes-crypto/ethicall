@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
 
@@ -7,18 +7,17 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ categoryId: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const userRole = (session.user as any).role;
-  if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+  if (ctx.role !== "ADMIN" && ctx.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
   }
 
   const { categoryId } = await params;
-  const organizationId = (session.user as any).organizationId;
+  const organizationId = ctx.organizationId;
   const body = await req.json();
   const { fields, name, description, status } = body;
 

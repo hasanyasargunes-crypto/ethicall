@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuid } from "uuid";
 
@@ -8,12 +8,12 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
   const { id: vendorId } = await params;
-  const orgId = (session.user as any).organizationId;
-  const userId = (session.user as any).id;
+  const orgId = ctx.organizationId;
+  const userId = ctx.userId;
 
   try {
     const { templateId, expiresInDays } = await req.json();

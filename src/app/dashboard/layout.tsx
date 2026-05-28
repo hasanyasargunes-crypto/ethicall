@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { SessionProvider } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -23,6 +23,7 @@ import {
   MessageSquareText,
   ChevronDown,
   ShieldCheck,
+  MonitorX,
 } from "lucide-react";
 
 type NavItem = {
@@ -44,6 +45,30 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+  const [impersonation, setImpersonation] = useState<{ impersonating: boolean; organization?: { id: string; name: string; slug: string } } | null>(null);
+
+  const checkImpersonation = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/impersonate");
+      if (res.ok) {
+        const data = await res.json();
+        setImpersonation(data);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if ((session?.user as any)?.role === "SUPER_ADMIN") {
+      checkImpersonation();
+    }
+  }, [session, checkImpersonation]);
+
+  async function handleExitImpersonation() {
+    await fetch("/api/admin/impersonate", { method: "DELETE" });
+    setImpersonation(null);
+    router.push("/dashboard/users");
+    router.refresh();
+  }
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -326,6 +351,22 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 md:ml-[250px] overflow-auto min-h-screen pt-14 md:pt-0">
+        {impersonation?.impersonating && (
+          <div className="bg-amber-500 text-white px-4 py-2.5 flex items-center justify-between gap-3 sticky top-0 z-30">
+            <div className="flex items-center gap-2 text-[13px] font-medium">
+              <MonitorX className="h-4 w-4 shrink-0" />
+              <span>
+                <strong>{impersonation.organization?.name}</strong> paneline bağlısınız (Destek Modu)
+              </span>
+            </div>
+            <button
+              onClick={handleExitImpersonation}
+              className="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-[12px] font-semibold transition-colors shrink-0"
+            >
+              Bağlantıyı Kes
+            </button>
+          </div>
+        )}
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">{children}</div>
       </main>
     </div>

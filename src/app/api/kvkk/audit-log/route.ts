@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const logs = await prisma.dataRequestAuditLog.findMany({
       where: { organizationId: orgId },
       include: {

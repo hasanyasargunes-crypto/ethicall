@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 // PUT: Update survey template
@@ -7,11 +7,11 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
   const { id } = await params;
-  const orgId = (session.user as any).organizationId;
+  const orgId = ctx.organizationId;
 
   try {
     const body = await req.json();
@@ -52,11 +52,11 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
   const { id } = await params;
-  const orgId = (session.user as any).organizationId;
+  const orgId = ctx.organizationId;
 
   try {
     const existing = await prisma.complianceSurveyTemplate.findFirst({

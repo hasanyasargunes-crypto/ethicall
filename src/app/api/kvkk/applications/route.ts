@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 
 function generateKVKKCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -97,12 +97,12 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const requests = await prisma.dataRequest.findMany({
       where: { organizationId: orgId },
       include: {

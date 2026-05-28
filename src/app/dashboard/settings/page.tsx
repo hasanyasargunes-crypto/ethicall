@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Mail, Lock, Check, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Check, AlertCircle, Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<"email" | "password">("email");
+  const [activeTab, setActiveTab] = useState<"email" | "password" | "support">("email");
 
   // Email change
   const [newEmail, setNewEmail] = useState("");
@@ -25,6 +25,41 @@ export default function SettingsPage() {
   const [pwError, setPwError] = useState("");
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
+
+  // Support access
+  const [supportAccess, setSupportAccess] = useState(true);
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportSuccess, setSupportSuccess] = useState("");
+
+  const userRole = (session?.user as any)?.role;
+  const isAdmin = userRole === "ADMIN" || userRole === "SUPER_ADMIN";
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetch("/api/settings/support-access")
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.allowSupportAccess !== undefined) setSupportAccess(d.allowSupportAccess);
+        })
+        .catch(() => {});
+    }
+  }, [isAdmin]);
+
+  async function handleToggleSupportAccess() {
+    setSupportLoading(true);
+    setSupportSuccess("");
+    const res = await fetch("/api/settings/support-access", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ allowSupportAccess: !supportAccess }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setSupportAccess(data.allowSupportAccess);
+      setSupportSuccess(data.allowSupportAccess ? "Destek erişimi açıldı" : "Destek erişimi kapatıldı");
+    }
+    setSupportLoading(false);
+  }
 
   async function handleSendEmailOtp() {
     setEmailLoading(true);
@@ -97,6 +132,7 @@ export default function SettingsPage() {
   const tabs = [
     { key: "email" as const, label: "E-posta Değiştir", icon: Mail },
     { key: "password" as const, label: "Şifre Değiştir", icon: Lock },
+    ...(isAdmin ? [{ key: "support" as const, label: "Destek Erişimi", icon: ShieldCheck }] : []),
   ];
 
   return (
@@ -333,6 +369,53 @@ export default function SettingsPage() {
               >
                 {pwLoading ? "Güncelleniyor..." : "Şifreyi Güncelle"}
               </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "support" && isAdmin && (
+          <div className="max-w-md">
+            <h3 className="text-[15px] font-semibold text-gray-900 mb-1">
+              Destek Ekibi Erişimi
+            </h3>
+            <p className="text-[13px] text-gray-500 mb-5">
+              EthicAll destek ekibinin panelinize bağlanarak kurulum ve
+              sorun giderme yapmasına izin verin.
+            </p>
+
+            {supportSuccess && (
+              <div className="flex items-center gap-2 bg-brand-50 text-brand-700 p-3 rounded-lg text-[13px] mb-4">
+                <Check className="h-4 w-4 shrink-0" />
+                {supportSuccess}
+              </div>
+            )}
+
+            <div className="bg-gray-50 rounded-xl p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[14px] font-medium text-gray-900">
+                    Destek Ekibi Panelime Bağlanabilsin
+                  </p>
+                  <p className="text-[12px] text-gray-500 mt-0.5">
+                    {supportAccess
+                      ? "Destek ekibi panelinize bağlanabilir"
+                      : "Destek erişimi kapalı"}
+                  </p>
+                </div>
+                <button
+                  onClick={handleToggleSupportAccess}
+                  disabled={supportLoading}
+                  className={`relative w-12 h-7 rounded-full transition-colors ${
+                    supportAccess ? "bg-brand-600" : "bg-gray-300"
+                  } ${supportLoading ? "opacity-50" : ""}`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      supportAccess ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
           </div>
         )}

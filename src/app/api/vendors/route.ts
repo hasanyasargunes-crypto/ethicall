@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuid } from "uuid";
 
 // GET: List all vendors for the org
 export async function GET() {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
-  const orgId = (session.user as any).organizationId;
+  const orgId = ctx.organizationId;
 
   const vendors = await prisma.vendor.findMany({
     where: { organizationId: orgId },
@@ -28,11 +28,11 @@ export async function GET() {
 
 // POST: Add new vendor
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
-  const orgId = (session.user as any).organizationId;
-  const userId = (session.user as any).id;
+  const orgId = ctx.organizationId;
+  const userId = ctx.userId;
 
   try {
     const body = await req.json();

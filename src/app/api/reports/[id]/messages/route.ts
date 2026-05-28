@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { messageSchema } from "@/lib/validation";
 
 export async function POST(
@@ -8,8 +8,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
@@ -20,7 +20,7 @@ export async function POST(
       return NextResponse.json({ error: "Geçersiz veri" }, { status: 400 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const report = await prisma.report.findFirst({
       where: { id, organizationId: orgId },
     });
@@ -33,7 +33,7 @@ export async function POST(
         reportId: id,
         content: parsed.data.content,
         senderType: "STAFF",
-        senderId: (session.user as any).id,
+        senderId: ctx.userId,
       },
       include: { sender: { select: { id: true, name: true } } },
     });

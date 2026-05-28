@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { sendTeamInviteEmail } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const userRole = (session.user as any).role;
-  if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN" && userRole !== "MANAGER") {
+  if (ctx.role !== "ADMIN" && ctx.role !== "SUPER_ADMIN" && ctx.role !== "MANAGER") {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
   }
 
   try {
     const body = await req.json();
     const { email, name, role } = body;
-    const organizationId = (session.user as any).organizationId;
+    const organizationId = ctx.organizationId;
 
     if (!email || !name || !role) {
       return NextResponse.json({ error: "Tüm alanlar zorunludur" }, { status: 400 });
@@ -69,7 +68,7 @@ export async function POST(req: NextRequest) {
         role,
         token,
         organizationId,
-        invitedById: (session.user as any).id,
+        invitedById: ctx.userId,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       },
     });

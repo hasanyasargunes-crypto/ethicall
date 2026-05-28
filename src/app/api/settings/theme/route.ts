@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const organizationId = (session.user as any).organizationId;
+  const organizationId = ctx.organizationId;
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
     select: {
@@ -24,17 +24,16 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) {
+  const ctx = await getSessionContext();
+  if (!ctx) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const userRole = (session.user as any).role;
-  if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+  if (ctx.role !== "ADMIN" && ctx.role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
   }
 
-  const organizationId = (session.user as any).organizationId;
+  const organizationId = ctx.organizationId;
   const body = await req.json();
 
   const { primaryColor, secondaryColor, fontFamily } = body;

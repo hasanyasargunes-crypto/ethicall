@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import crypto from "crypto";
 
 export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const templates = await prisma.kVKKFormTemplate.findMany({
       where: { organizationId: orgId },
       orderBy: { updatedAt: "desc" },
@@ -24,12 +24,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const body = await req.json();
     const { name, fields, status, description, locale } = body;
 
@@ -54,12 +54,12 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const ctx = await getSessionContext();
+    if (!ctx) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
-    const orgId = (session.user as any).organizationId;
+    const orgId = ctx.organizationId;
     const body = await req.json();
     const { id, name, fields, status, description, locale } = body;
 

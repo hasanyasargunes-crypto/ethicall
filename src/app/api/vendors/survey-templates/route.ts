@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getSessionContext } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_SURVEY_QUESTIONS } from "@/lib/vendor-constants";
 
 // GET: List survey templates
 export async function GET() {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
-  const orgId = (session.user as any).organizationId;
+  const orgId = ctx.organizationId;
 
   const templates = await prisma.complianceSurveyTemplate.findMany({
     where: { organizationId: orgId },
@@ -21,10 +21,10 @@ export async function GET() {
 
 // POST: Create survey template
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const ctx = await getSessionContext();
+  if (!ctx) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
 
-  const orgId = (session.user as any).organizationId;
+  const orgId = ctx.organizationId;
 
   try {
     const body = await req.json();

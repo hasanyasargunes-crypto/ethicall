@@ -23,6 +23,8 @@ import {
   Shield,
   UserCheck,
   Package,
+  LogIn,
+  Lock,
 } from "lucide-react";
 
 const PLANS = [
@@ -89,6 +91,12 @@ export default function UsersPage() {
   const [deleteOrg, setDeleteOrg] = useState<Org | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+  // Impersonate state
+  const [impersonateOrg, setImpersonateOrg] = useState<Org | null>(null);
+  const [impersonatePassword, setImpersonatePassword] = useState("");
+  const [impersonating, setImpersonating] = useState(false);
+  const [impersonateError, setImpersonateError] = useState("");
 
   // Create form fields
   const [orgName, setOrgName] = useState("");
@@ -203,6 +211,30 @@ export default function UsersPage() {
     setDeleteConfirm("");
     setDeleting(false);
     fetchOrgs();
+  }
+
+  async function handleImpersonate() {
+    if (!impersonateOrg) return;
+    setImpersonating(true);
+    setImpersonateError("");
+
+    const res = await fetch("/api/admin/impersonate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ organizationId: impersonateOrg.id, password: impersonatePassword }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setImpersonateError(data.error);
+      setImpersonating(false);
+      return;
+    }
+
+    setImpersonateOrg(null);
+    setImpersonatePassword("");
+    setImpersonating(false);
+    router.push("/dashboard");
+    router.refresh();
   }
 
   function copyPassword() {
@@ -534,6 +566,53 @@ export default function UsersPage() {
         </div>
       )}
 
+      {/* ─── IMPERSONATE MODAL ─── */}
+      {impersonateOrg && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center sm:p-4" onClick={() => { setImpersonateOrg(null); setImpersonatePassword(""); setImpersonateError(""); }}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+                <LogIn className="h-7 w-7 text-amber-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1 text-center">Panele Bağlan</h3>
+              <p className="text-[13px] text-gray-500 mb-5 text-center">
+                <strong>{impersonateOrg.name}</strong> paneline destek modu ile bağlanacaksınız.
+              </p>
+              {impersonateError && (
+                <div className="bg-red-50 text-red-600 p-3 rounded-lg text-[13px] mb-4">{impersonateError}</div>
+              )}
+              <div className="mb-5">
+                <label className="block text-[13px] font-medium text-gray-700 mb-1.5">
+                  <Lock className="h-3.5 w-3.5 inline mr-1" />
+                  Destek Şifresi
+                </label>
+                <input
+                  type="password"
+                  value={impersonatePassword}
+                  onChange={(e) => setImpersonatePassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleImpersonate()}
+                  placeholder="Şifreyi girin"
+                  autoFocus
+                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-center tracking-widest font-mono"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => { setImpersonateOrg(null); setImpersonatePassword(""); setImpersonateError(""); }} className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600">
+                  İptal
+                </button>
+                <button
+                  onClick={handleImpersonate}
+                  disabled={impersonating || !impersonatePassword}
+                  className="flex-1 px-4 py-2.5 text-sm bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50 font-medium"
+                >
+                  {impersonating ? "Bağlanıyor..." : "Bağlan"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── ORGANIZATIONS TABLE ─── */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
@@ -603,6 +682,11 @@ export default function UsersPage() {
                   </td>
                   <td>
                     <div className="flex items-center gap-1">
+                      {org.slug !== "ethicall" && (
+                        <button onClick={() => { setImpersonateOrg(org); setImpersonateError(""); }} className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors" title="Panele Bağlan">
+                          <LogIn className="h-4 w-4" />
+                        </button>
+                      )}
                       <button onClick={() => { setEditOrg(org); setShowForm(false); setError(""); }} className="p-1.5 rounded-lg text-gray-400 hover:text-brand-600 hover:bg-brand-50 transition-colors" title="Düzenle">
                         <Pencil className="h-4 w-4" />
                       </button>
