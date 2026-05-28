@@ -233,8 +233,7 @@ export default function UsersPage() {
     setImpersonateOrg(null);
     setImpersonatePassword("");
     setImpersonating(false);
-    router.push("/dashboard");
-    router.refresh();
+    window.open("/dashboard", "_blank");
   }
 
   function copyPassword() {

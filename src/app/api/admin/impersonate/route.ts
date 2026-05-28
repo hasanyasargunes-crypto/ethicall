@@ -90,8 +90,15 @@ export async function GET() {
     return NextResponse.json({ impersonating: false });
   }
 
+  const admin = await prisma.user.findFirst({
+    where: { organizationId: org.id, role: "ADMIN" },
+    select: { name: true, email: true },
+    orderBy: { createdAt: "asc" },
+  });
+
   return NextResponse.json({
     impersonating: true,
     organization: { id: org.id, name: org.name, slug: org.slug },
+    admin: admin || null,
   });
 }

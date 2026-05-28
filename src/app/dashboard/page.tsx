@@ -65,11 +65,23 @@ export default function DashboardPage() {
   const { data: session } = useSession();
   const [ethicsStats, setEthicsStats] = useState<EthicsStats | null>(null);
   const [kvkkStats, setKVKKStats] = useState<KVKKStats | null>(null);
+  const [displayName, setDisplayName] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/dashboard/stats").then((r) => r.json()).then(setEthicsStats).catch(() => {});
     fetch("/api/kvkk/stats").then((r) => r.json()).then(setKVKKStats).catch(() => {});
-  }, []);
+
+    if ((session?.user as any)?.role === "SUPER_ADMIN") {
+      fetch("/api/admin/impersonate")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.impersonating && data.admin?.name) {
+            setDisplayName(data.admin.name.split(" ")[0]);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session]);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -92,7 +104,7 @@ export default function DashboardPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-[26px] font-bold text-gray-900 tracking-tight">
-          {greeting()}, {session?.user?.name?.split(" ")[0]}
+          {greeting()}, {displayName || session?.user?.name?.split(" ")[0]}
         </h1>
         <p className="text-gray-500 text-[15px] mt-1">
           EthicAll platformunuzun genel durumuna buradan göz atabilirsiniz.

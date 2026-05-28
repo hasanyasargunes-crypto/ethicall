@@ -45,7 +45,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
-  const [impersonation, setImpersonation] = useState<{ impersonating: boolean; organization?: { id: string; name: string; slug: string } } | null>(null);
+  const [impersonation, setImpersonation] = useState<{ impersonating: boolean; organization?: { id: string; name: string; slug: string }; admin?: { name: string; email: string } | null } | null>(null);
 
   const checkImpersonation = useCallback(async () => {
     try {
@@ -66,6 +66,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   async function handleExitImpersonation() {
     await fetch("/api/admin/impersonate", { method: "DELETE" });
     setImpersonation(null);
+    try { window.close(); } catch {}
     router.push("/dashboard/users");
     router.refresh();
   }
@@ -103,7 +104,15 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   const userRole = (session.user as any)?.role;
   const isSuperAdmin = userRole === "SUPER_ADMIN";
-  const userName = session.user?.name || "";
+  const isImpersonating = impersonation?.impersonating === true;
+
+  const displayName = isImpersonating && impersonation?.admin?.name
+    ? impersonation.admin.name
+    : (session.user?.name || "");
+  const displayOrgName = isImpersonating && impersonation?.organization?.name
+    ? impersonation.organization.name
+    : ((session.user as any)?.organizationName || "");
+  const userName = displayName;
   const userInitials = userName
     .split(" ")
     .map((w: string) => w[0])
@@ -145,7 +154,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   const sections = [ethicsNav, kvkkNav, vendorNav];
 
-  const adminNav = isSuperAdmin
+  const adminNav = isSuperAdmin && !isImpersonating
     ? [{ href: "/dashboard/users", label: "Organizasyonlar", icon: Building2 }]
     : [];
 
@@ -335,7 +344,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
               <p className="text-[11px] text-gray-400 truncate">
-                {(session.user as any)?.organizationName}
+                {displayOrgName}
               </p>
             </div>
             <button
