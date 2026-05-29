@@ -1,0 +1,240 @@
+/* ============================================
+   EthicAll Landing Page — Design Tokens & Styles
+   ============================================ */
+
+:root {
+  /* Greens */
+  --lp-green-900: #06231C;
+  --lp-green-700: #0F5C3F;
+  --lp-green-600: #157852;
+  --lp-green-500: #1B9B6E;
+  --lp-green-100: rgba(15, 92, 63, 0.10);
+  --lp-green-50: rgba(15, 92, 63, 0.06);
+
+  /* Amber / gold accent */
+  --lp-amber: #C9A86A;
+  --lp-amber-soft: #D9BE89;
+  --lp-amber-dark: #B98E4C;
+
+  /* Backgrounds */
+  --lp-bg-paper: #F6F1E4;
+  --lp-bg-white: #FFFFFF;
+
+  /* Ink */
+  --lp-ink: #0F1815;
+  --lp-ink-2: #374740;
+  --lp-ink-muted: #5C6B64;
+  --lp-ink-soft: #8A9690;
+
+  /* Borders */
+  --lp-border: rgba(15, 24, 21, 0.09);
+  --lp-border-strong: rgba(15, 24, 21, 0.16);
+
+  /* Misc */
+  --lp-red: #B84240;
+
+  /* Shadows */
+  --lp-shadow-sm: 0 1px 3px rgba(15, 24, 21, 0.06);
+  --lp-shadow-lg: 0 8px 32px rgba(15, 24, 21, 0.10);
+  --lp-shadow-green: 0 12px 48px rgba(15, 92, 63, 0.18);
+
+  /* Radii */
+  --lp-radius-lg: 16px;
+  --lp-radius-xl: 22px;
+}
+
+/* ---- Scroll Reveal ---- */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 560ms cubic-bezier(0.2, 0.7, 0.2, 1),
+              transform 560ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.lp-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lp-reveal.reveal-shown {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ---- Eyebrow ---- */
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 14px 6px 11px;
+  border-radius: 99px;
+  background: var(--lp-green-50);
+  border: 1px solid var(--lp-green-100);
+  color: var(--lp-green-700);
+}
+.lp-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lp-green-600);
+}
+
+/* ---- Buttons ---- */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 12px;
+  padding: 12px 20px;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+.lp-btn:hover {
+  transform: translateY(-1px);
+}
+.lp-btn-primary {
+  background: var(--lp-green-700);
+  color: var(--lp-bg-paper);
+  box-shadow: var(--lp-shadow-sm);
+}
+.lp-btn-primary:hover {
+  background: #0A4D34;
+  box-shadow: var(--lp-shadow-lg);
+}
+.lp-btn-ghost {
+  background: transparent;
+  color: var(--lp-ink-2);
+  border: 1px solid var(--lp-border-strong);
+}
+.lp-btn-ghost:hover {
+  background: rgba(15, 24, 21, 0.03);
+}
+
+/* ---- Container ---- */
+.lp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ---- Display font class ---- */
+.lp-display {
+  font-family: var(--font-display), serif;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+/* ---- Mono class ---- */
+.lp-mono {
+  font-family: var(--font-mono), ui-monospace, "SF Mono", monospace;
+}
+
+/* ---- Responsive Grids ---- */
+.lp-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 64px;
+  align-items: center;
+}
+.lp-products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.lp-deep-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 72px;
+  align-items: start;
+}
+.lp-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+.lp-security-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.lp-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.lp-footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 56px;
+}
+.lp-footer-cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+/* ---- Dashboard Preview ---- */
+.lp-dash-body {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+}
+.lp-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.lp-dash-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 130px 110px 96px;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1080px) {
+  .lp-deep-grid { grid-template-columns: 1fr; gap: 40px; }
+  .lp-security-grid { gap: 16px; }
+}
+@media (max-width: 960px) {
+  .lp-hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .lp-hero-panel { max-width: 520px; }
+  .lp-products-grid { grid-template-columns: 1fr 1fr; }
+  .lp-products-grid > *:first-child { grid-column: span 2 !important; }
+  .lp-steps-grid { grid-template-columns: 1fr 1fr; gap: 36px 28px; }
+  .lp-step-connector { display: none; }
+  .lp-pricing-grid { grid-template-columns: 1fr; max-width: 460px; margin-left: auto; margin-right: auto; }
+  .lp-pricing-grid > * { transform: none !important; }
+  .lp-footer-grid { grid-template-columns: 1fr; gap: 40px; }
+  .lp-nav-desktop { display: none !important; }
+}
+@media (max-width: 680px) {
+  .lp-container { padding: 0 20px; }
+  .lp-products-grid { grid-template-columns: 1fr; }
+  .lp-products-grid > *:first-child { grid-column: span 1 !important; }
+  .lp-security-grid { grid-template-columns: 1fr; }
+  .lp-steps-grid { grid-template-columns: 1fr; }
+  .lp-footer-cols { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
+  .lp-nav-login { display: none !important; }
+  .lp-dash-side { display: none !important; }
+  .lp-dash-body { grid-template-columns: 1fr !important; }
+  .lp-dash-stats { grid-template-columns: 1fr 1fr !important; }
+  .lp-dash-row { grid-template-columns: 1fr auto !important; }
+  .lp-dash-row > *:nth-child(1),
+  .lp-dash-row > *:nth-child(3),
+  .lp-dash-row > *:nth-child(5) { display: none; }
+}
+
+/* ---- Caret animation ---- */
+@keyframes lp-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
