@@ -10,6 +10,7 @@ const DEFAULT_LINKS = [
   ["Nasıl Çalışır", "#nasil"],
   ["Güvenlik", "#guvenlik"],
   ["Fiyatlandırma", "#fiyat"],
+  ["Blog", "/blog"],
 ];
 
 export default function Nav({ data }: { data?: LandingPageData | null }) {

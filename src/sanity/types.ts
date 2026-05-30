@@ -1,3 +1,45 @@
+// ─── Blog types ───
+
+export interface BlogAuthor {
+  name: string;
+  slug: string;
+  avatar?: SanityImage;
+  role?: string;
+}
+
+export interface BlogCategory {
+  title: string;
+  slug: string;
+  description?: string;
+  count?: number;
+}
+
+export interface BlogPost {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: SanityImage & { alt?: string };
+  publishedAt?: string;
+  featured?: boolean;
+  author?: BlogAuthor;
+  categories?: BlogCategory[];
+  body?: any[]; // Portable Text blocks
+  seo?: {
+    title?: string;
+    description?: string;
+    ogImage?: SanityImage;
+    keywords?: string[];
+  };
+}
+
+export interface BlogPageData {
+  posts: BlogPost[];
+  categories: BlogCategory[];
+}
+
+// ─── Common types ───
+
 export interface SanityImage {
   _type: "image";
   asset: { _ref: string; _type: "reference" };

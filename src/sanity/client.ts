@@ -6,8 +6,12 @@ export const client = createClient({
   stega: { enabled: false },
 });
 
-export async function sanityFetch<T>(query: string, params?: Record<string, unknown>): Promise<T> {
+export async function sanityFetch<T>(
+  query: string,
+  params?: Record<string, unknown>,
+  tags?: string[],
+): Promise<T> {
   return client.fetch<T>(query, params ?? {}, {
-    next: { revalidate: 60, tags: ["landing"] },
+    next: { revalidate: 60, tags: tags ?? ["sanity"] },
   });
 }
