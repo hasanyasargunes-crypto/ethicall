@@ -1,8 +1,9 @@
 "use client";
 
 import { Reveal } from "./atoms";
+import type { LandingPageData } from "@/sanity/types";
 
-const BADGES = [
+const DEFAULT_BADGES = [
   ["EU 2019/1937", "Whistleblower Directive"],
   ["KVKK", "6698 sayılı kanun"],
   ["GDPR", "AB veri tüzüğü"],
@@ -10,7 +11,10 @@ const BADGES = [
   ["AES-256", "uçtan uca şifreleme"],
 ];
 
-export default function TrustBar() {
+export default function TrustBar({ data }: { data?: LandingPageData | null }) {
+  const BADGES = data?.trustBadges
+    ? data.trustBadges.map((b) => [b.name, b.description])
+    : DEFAULT_BADGES;
   return (
     <section
       style={{
@@ -38,7 +42,7 @@ export default function TrustBar() {
               whiteSpace: "nowrap",
             }}
           >
-            Uyumluluk & güvenlik standartları
+            {data?.trustLabel ?? "Uyumluluk & güvenlik standartları"}
           </span>
           <div
             style={{

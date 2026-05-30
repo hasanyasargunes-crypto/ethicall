@@ -1,6 +1,7 @@
 "use client";
 
 import { Logo } from "./atoms";
+import type { LandingPageData } from "@/sanity/types";
 
 const COLS: [string, string[]][] = [
   ["Ürünler", ["Etik İhbar Hattı", "İlgili Kişi Başvuruları", "Tedarikçi Uyumu", "Raporlama"]],
@@ -9,7 +10,13 @@ const COLS: [string, string[]][] = [
   ["Yasal", ["Gizlilik Politikası", "KVKK Aydınlatma", "Kullanım Şartları", "Veri İşleme (DPA)"]],
 ];
 
-export default function Footer() {
+const DEFAULT_BADGES = ["EU 2019/1937", "KVKK · GDPR", "ISO 27001"];
+
+export default function Footer({ data }: { data?: LandingPageData | null }) {
+  const columns = data?.footerColumns
+    ? data.footerColumns.map((c) => [c.title, c.links.map((l) => l.label)] as [string, string[]])
+    : COLS;
+  const badges = data?.footerBadges ?? DEFAULT_BADGES;
   return (
     <footer
       style={{
@@ -45,12 +52,11 @@ export default function Footer() {
                 textWrap: "pretty" as any,
               }}
             >
-              Etik ihbar, KVKK başvuruları ve tedarikçi uyumu için bütünleşik
-              kurumsal platform.
+              {data?.footerTagline ?? "Etik ihbar, KVKK başvuruları ve tedarikçi uyumu için bütünleşik kurumsal platform."}
             </p>
           </div>
           <div className="lp-footer-cols">
-            {COLS.map(([title, items], i) => (
+            {columns.map(([title, items], i) => (
               <div key={i}>
                 <h5
                   className="lp-mono"
@@ -105,15 +111,11 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} EthicAll. Tüm hakları saklıdır.
           </span>
           <div style={{ display: "flex", gap: 18 }}>
-            <span className="lp-mono" style={{ fontSize: 11, color: "var(--lp-ink-soft)" }}>
-              EU 2019/1937
-            </span>
-            <span className="lp-mono" style={{ fontSize: 11, color: "var(--lp-ink-soft)" }}>
-              KVKK &middot; GDPR
-            </span>
-            <span className="lp-mono" style={{ fontSize: 11, color: "var(--lp-ink-soft)" }}>
-              ISO 27001
-            </span>
+            {badges.map((b, i) => (
+              <span key={i} className="lp-mono" style={{ fontSize: 11, color: "var(--lp-ink-soft)" }}>
+                {b}
+              </span>
+            ))}
           </div>
         </div>
       </div>

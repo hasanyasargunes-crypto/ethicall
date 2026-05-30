@@ -2,6 +2,9 @@
 
 import { Reveal, SectionHead } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
+
+const ICON_MAP: Record<string, (p: { size?: number }) => React.ReactNode> = Icons as any;
 
 const STEPS = [
   {
@@ -30,21 +33,29 @@ const STEPS = [
   },
 ];
 
-export default function HowItWorks() {
+export default function HowItWorks({ data }: { data?: LandingPageData | null }) {
+  const steps = data?.howSteps
+    ? data.howSteps.map((s) => ({
+        num: s.num,
+        icon: ICON_MAP[s.iconName] ?? Icons.shield,
+        title: s.title,
+        desc: s.description,
+      }))
+    : STEPS;
   return (
     <section id="nasil" style={{ padding: "110px 0 100px" }}>
       <div className="lp-container">
         <SectionHead
-          eyebrow="Nasıl çalışır"
-          title="İlk bildirimden <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>kapanışa</em> kadar dört adım"
-          lede="Her adım yasal yükümlülüklere uygun, her etkileşim kayıt altında."
+          eyebrow={data?.howEyebrow ?? "Nasıl çalışır"}
+          title={data?.howTitle ?? "İlk bildirimden <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>kapanışa</em> kadar dört adım"}
+          lede={data?.howSubtitle ?? "Her adım yasal yükümlülüklere uygun, her etkileşim kayıt altında."}
         />
         <div className="lp-steps-grid" style={{ marginTop: 56 }}>
-          {STEPS.map((step, i) => {
+          {steps.map((step, i) => {
             const ICO = step.icon;
             return (
               <Reveal key={i} delay={i * 90} style={{ position: "relative" }}>
-                {i < STEPS.length - 1 && (
+                {i < steps.length - 1 && (
                   <span
                     className="lp-step-connector"
                     aria-hidden="true"

@@ -3,8 +3,16 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Logo } from "./atoms";
+import type { LandingPageData } from "@/sanity/types";
 
-export default function Nav() {
+const DEFAULT_LINKS = [
+  ["Ürünler", "#urunler"],
+  ["Nasıl Çalışır", "#nasil"],
+  ["Güvenlik", "#guvenlik"],
+  ["Fiyatlandırma", "#fiyat"],
+];
+
+export default function Nav({ data }: { data?: LandingPageData | null }) {
   const [atTop, setAtTop] = useState(true);
 
   useEffect(() => {
@@ -14,12 +22,9 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = [
-    ["Ürünler", "#urunler"],
-    ["Nasıl Çalışır", "#nasil"],
-    ["Güvenlik", "#guvenlik"],
-    ["Fiyatlandırma", "#fiyat"],
-  ];
+  const links = data?.navLinks
+    ? data.navLinks.map((l) => [l.label, l.href])
+    : DEFAULT_LINKS;
 
   return (
     <header
@@ -93,14 +98,14 @@ export default function Nav() {
             className="lp-btn lp-btn-ghost lp-nav-login"
             style={{ padding: "9px 16px", fontSize: 14 }}
           >
-            Giriş Yap
+            {data?.navLoginText ?? "Giriş Yap"}
           </Link>
           <a
             href="#demo"
             className="lp-btn lp-btn-primary"
             style={{ padding: "10px 18px", fontSize: 14 }}
           >
-            Demo Talep Et
+            {data?.navCtaText ?? "Demo Talep Et"}
           </a>
         </div>
       </div>

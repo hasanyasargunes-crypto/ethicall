@@ -2,6 +2,9 @@
 
 import { Reveal } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
+
+const ICON_MAP: Record<string, (p: { size?: number }) => React.ReactNode> = Icons as any;
 
 const FEATURES = [
   {
@@ -26,7 +29,14 @@ const FEATURES = [
   },
 ];
 
-export default function EthicsDeep() {
+export default function EthicsDeep({ data }: { data?: LandingPageData | null }) {
+  const features = data?.ethicsFeatures
+    ? data.ethicsFeatures.map((f) => ({
+        icon: ICON_MAP[f.iconName] ?? Icons.shield,
+        title: f.title,
+        desc: f.description,
+      }))
+    : FEATURES;
   return (
     <section
       style={{
@@ -40,7 +50,7 @@ export default function EthicsDeep() {
           <div>
             <Reveal as="span" className="lp-eyebrow">
               <span className="lp-eyebrow-dot" />
-              Etik İhbar Hattı
+              {data?.ethicsEyebrow ?? "Etik İhbar Hattı"}
             </Reveal>
             <Reveal
               as="h2"
@@ -54,7 +64,7 @@ export default function EthicsDeep() {
                 color: "var(--lp-ink)",
               }}
             >
-              Sessizliğin kırıldığı an, koruma başlar.
+              {data?.ethicsTitle ?? "Sessizliğin kırıldığı an, koruma başlar."}
             </Reveal>
             <Reveal
               as="p"
@@ -68,8 +78,7 @@ export default function EthicsDeep() {
                 textWrap: "pretty" as any,
               }}
             >
-              İhbarcıyı koruyan, kurumu yasal yükümlülüklerine uygun kılan ve
-              her adımı kanıtlanabilir hale getiren uçtan uca bir süreç.
+              {data?.ethicsSubtitle ?? "İhbarcıyı koruyan, kurumu yasal yükümlülüklerine uygun kılan ve her adımı kanıtlanabilir hale getiren uçtan uca bir süreç."}
             </Reveal>
             <Reveal
               delay={180}
@@ -80,13 +89,13 @@ export default function EthicsDeep() {
                 className="lp-btn lp-btn-primary"
                 style={{ padding: "12px 20px" }}
               >
-                Canlı Demo İste <Icons.arrow size={16} />
+                {data?.ethicsCtaText ?? "Canlı Demo İste"} <Icons.arrow size={16} />
               </a>
             </Reveal>
           </div>
 
           <div>
-            {FEATURES.map((f, i) => {
+            {features.map((f, i) => {
               const ICO = f.icon;
               return (
                 <Reveal

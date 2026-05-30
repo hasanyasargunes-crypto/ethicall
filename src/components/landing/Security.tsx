@@ -2,6 +2,9 @@
 
 import { Reveal } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
+
+const ICON_MAP: Record<string, (p: { size?: number }) => React.ReactNode> = Icons as any;
 
 const ITEMS = [
   {
@@ -26,7 +29,14 @@ const ITEMS = [
   },
 ];
 
-export default function Security() {
+export default function Security({ data }: { data?: LandingPageData | null }) {
+  const items = data?.securityItems
+    ? data.securityItems.map((s) => ({
+        icon: ICON_MAP[s.iconName] ?? Icons.shield,
+        title: s.title,
+        desc: s.description,
+      }))
+    : ITEMS;
   return (
     <section
       id="guvenlik"
@@ -61,7 +71,7 @@ export default function Security() {
             }}
           >
             <span className="lp-eyebrow-dot" style={{ background: "var(--lp-amber)" }} />
-            Güvenlik & gizlilik
+            {data?.securityEyebrow ?? "Güvenlik & gizlilik"}
           </Reveal>
           <Reveal
             as="h2"
@@ -73,7 +83,7 @@ export default function Security() {
               textWrap: "balance" as any,
             }}
           >
-            Güven, varsayılan ayardır.
+            {data?.securityTitle ?? "Güven, varsayılan ayardır."}
           </Reveal>
           <Reveal
             as="p"
@@ -87,13 +97,12 @@ export default function Security() {
               textWrap: "pretty" as any,
             }}
           >
-            EthicAll, gizliliği sonradan eklenen bir özellik değil, mimarinin
-            temeli olarak ele alır.
+            {data?.securitySubtitle ?? "EthicAll, gizliliği sonradan eklenen bir özellik değil, mimarinin temeli olarak ele alır."}
           </Reveal>
         </div>
 
         <div className="lp-security-grid" style={{ marginTop: 54 }}>
-          {ITEMS.map((item, i) => {
+          {items.map((item, i) => {
             const ICO = item.icon;
             return (
               <Reveal

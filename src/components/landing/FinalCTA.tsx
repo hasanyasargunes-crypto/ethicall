@@ -2,8 +2,9 @@
 
 import { Reveal } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
 
-export default function FinalCTA() {
+export default function FinalCTA({ data }: { data?: LandingPageData | null }) {
   return (
     <section id="demo" style={{ padding: "40px 0 110px" }}>
       <div className="lp-container">
@@ -42,7 +43,7 @@ export default function FinalCTA() {
                 textWrap: "balance" as any,
               }}
             >
-              Etik altyapınızı bugün kurun.
+              {data?.ctaTitle ?? "Etik altyapınızı bugün kurun."}
             </h2>
             <p
               style={{
@@ -54,8 +55,7 @@ export default function FinalCTA() {
                 textWrap: "pretty" as any,
               }}
             >
-              30 dakikalık bir demoda, EthicAll&apos;ın kurumunuzun uyum
-              yükümlülüklerini nasıl tek platforma indirgediğini gösterelim.
+              {data?.ctaSubtitle ?? "30 dakikalık bir demoda, EthicAll'ın kurumunuzun uyum yükümlülüklerini nasıl tek platforma indirgediğini gösterelim."}
             </p>
             <div
               style={{
@@ -75,7 +75,7 @@ export default function FinalCTA() {
                   fontSize: 15.5,
                 }}
               >
-                Demo Talep Et <Icons.arrow size={17} />
+                {data?.ctaPrimary ?? "Demo Talep Et"} <Icons.arrow size={17} />
               </a>
               <a
                 href="#fiyat"
@@ -88,7 +88,7 @@ export default function FinalCTA() {
                   fontSize: 15.5,
                 }}
               >
-                Fiyatlandırmayı İncele
+                {data?.ctaSecondary ?? "Fiyatlandırmayı İncele"}
               </a>
             </div>
           </div>

@@ -2,6 +2,7 @@
 
 import { Reveal, SectionHead } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
 
 const PLANS = [
   {
@@ -49,7 +50,19 @@ const PLANS = [
   },
 ];
 
-export default function Pricing() {
+export default function Pricing({ data }: { data?: LandingPageData | null }) {
+  const plans = data?.pricingPlans
+    ? data.pricingPlans.map((p) => ({
+        name: p.name,
+        price: p.price,
+        period: p.period,
+        desc: p.description,
+        feats: p.features,
+        cta: p.ctaText,
+        featured: p.featured ?? false,
+        badge: p.badge,
+      }))
+    : PLANS;
   return (
     <section
       id="fiyat"
@@ -62,13 +75,13 @@ export default function Pricing() {
       <div className="lp-container">
         <SectionHead
           align="center"
-          eyebrow="Fiyatlandırma"
-          title="Ölçeğinize göre <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>esnek</em> planlar"
-          lede="Her ölçekte kurum için esnek planlar. Tüm planlar uçtan uca şifreleme ve uyumluluk altyapısını içerir."
+          eyebrow={data?.pricingEyebrow ?? "Fiyatlandırma"}
+          title={data?.pricingTitle ?? "Ölçeğinize göre <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>esnek</em> planlar"}
+          lede={data?.pricingSubtitle ?? "Her ölçekte kurum için esnek planlar. Tüm planlar uçtan uca şifreleme ve uyumluluk altyapısını içerir."}
           maxw={620}
         />
         <div className="lp-pricing-grid" style={{ marginTop: 52 }}>
-          {PLANS.map((pl, i) => (
+          {plans.map((pl, i) => (
             <Reveal
               key={i}
               delay={i * 90}
@@ -105,7 +118,7 @@ export default function Pricing() {
                     letterSpacing: "0.08em",
                   }}
                 >
-                  EN POPÜLER
+                  {(pl as any).badge ?? "EN POPÜLER"}
                 </span>
               )}
               <h3

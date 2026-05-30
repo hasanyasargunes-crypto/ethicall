@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Reveal, SectionHead } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
 
 type Product = {
   key: string;
@@ -252,17 +253,32 @@ function ProductCard({ p, delay }: { p: Product; delay: number }) {
   );
 }
 
-export default function Products() {
+const ICON_MAP: Record<string, (p: { size?: number }) => React.ReactNode> = Icons as any;
+
+export default function Products({ data }: { data?: LandingPageData | null }) {
+  const products: Product[] = data?.productsItems
+    ? data.productsItems.map((p) => ({
+        key: p.name,
+        icon: ICON_MAP[p.iconName] ?? Icons.shield,
+        tag: p.tag,
+        name: p.name,
+        tagline: p.tagline,
+        desc: p.description,
+        points: p.points ?? [],
+        featured: p.featured ?? false,
+      }))
+    : PRODUCTS;
+
   return (
     <section id="urunler" style={{ padding: "110px 0 100px" }}>
       <div className="lp-container">
         <SectionHead
-          eyebrow="Tek platform, üç ürün"
-          title="Uyumun her cephesi <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>tek</em> çatı altında"
-          lede="EthicAll; etik ihbardan veri sahibi taleplerine, tedarikçi denetiminden risk skorlamasına kadar tüm uyum sürecini birbirine bağlar."
+          eyebrow={data?.productsEyebrow ?? "Tek platform, üç ürün"}
+          title={data?.productsTitle ?? "Uyumun her cephesi <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>tek</em> çatı altında"}
+          lede={data?.productsSubtitle ?? "EthicAll; etik ihbardan veri sahibi taleplerine, tedarikçi denetiminden risk skorlamasına kadar tüm uyum sürecini birbirine bağlar."}
         />
         <div className="lp-products-grid" style={{ marginTop: 52 }}>
-          {PRODUCTS.map((p, i) => (
+          {products.map((p, i) => (
             <ProductCard key={p.key} p={p} delay={i * 90} />
           ))}
         </div>

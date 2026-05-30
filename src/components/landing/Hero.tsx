@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Reveal } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
 
 const PLAIN_LINES = [
   "Satın alma müdürü, X tedarikçisinden",
@@ -290,7 +291,7 @@ function GridLines() {
   );
 }
 
-export default function Hero() {
+export default function Hero({ data }: { data?: LandingPageData | null }) {
   return (
     <section
       style={{
@@ -318,7 +319,7 @@ export default function Hero() {
         <div>
           <Reveal as="span" className="lp-eyebrow" style={{ whiteSpace: "nowrap" }}>
             <span className="lp-eyebrow-dot" />
-            AB Directive & KVKK uyumlu
+            {data?.heroTitle ? "AB Directive & KVKK uyumlu" : "AB Directive & KVKK uyumlu"}
           </Reveal>
 
           <Reveal
@@ -336,10 +337,10 @@ export default function Hero() {
             }}
           >
             <>
-              Etik kültürü
+              {data?.heroTitle ?? "Etik kültürü"}
               <br />
-              <span style={{ color: "var(--lp-green-700)" }}>ölçülebilir</span>{" "}
-              bir varlığa dönüştürün.
+              <span style={{ color: "var(--lp-green-700)" }}>{data?.heroTitleAccent ?? "ölçülebilir"}</span>{" "}
+              {data?.heroTitle ? "" : "bir varlığa dönüştürün."}
             </>
           </Reveal>
 
@@ -376,14 +377,14 @@ export default function Hero() {
               className="lp-btn lp-btn-primary"
               style={{ padding: "14px 22px", fontSize: 15.5 }}
             >
-              Demo Talep Et <Icons.arrow size={17} />
+              {data?.heroCtaPrimary ?? "Demo Talep Et"} <Icons.arrow size={17} />
             </a>
             <a
               href="#urunler"
               className="lp-btn lp-btn-ghost"
               style={{ padding: "14px 22px", fontSize: 15.5 }}
             >
-              Ürünleri Keşfet
+              {data?.heroCtaSecondary ?? "Ürünleri Keşfet"}
             </a>
           </Reveal>
 

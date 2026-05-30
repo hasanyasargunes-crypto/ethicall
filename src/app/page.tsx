@@ -1,38 +1,59 @@
-"use client";
+import { sanityFetch } from "@/sanity/client";
+import { landingPageQuery } from "@/sanity/queries";
+import { urlFor } from "@/sanity/image";
+import type { LandingPageData } from "@/sanity/types";
+import type { Metadata } from "next";
+import LandingClient from "@/components/landing/LandingClient";
 
-import { useReveal } from "@/components/landing/atoms";
-import Nav from "@/components/landing/Nav";
-import Hero from "@/components/landing/Hero";
-import TrustBar from "@/components/landing/TrustBar";
-import Products from "@/components/landing/Products";
-import EthicsDeep from "@/components/landing/EthicsDeep";
-import HowItWorks from "@/components/landing/HowItWorks";
-import DashboardPreview from "@/components/landing/DashboardPreview";
-import Security from "@/components/landing/Security";
-import Pricing from "@/components/landing/Pricing";
-import FAQ from "@/components/landing/FAQ";
-import FinalCTA from "@/components/landing/FinalCTA";
-import Footer from "@/components/landing/Footer";
+export async function generateMetadata(): Promise<Metadata> {
+  let data: LandingPageData | null = null;
+  try {
+    data = await sanityFetch<LandingPageData>(landingPageQuery);
+  } catch {
+    /* fallback to defaults */
+  }
 
-export default function Home() {
-  useReveal();
+  const title = data?.seo?.title ?? "EthicAll - Anonim Etik İhbar Platformu";
+  const description =
+    data?.seo?.description ??
+    "Kurumsal şirketler için anonim etik ihbar hattı, KVKK başvuru yönetimi ve tedarikçi uyum platformu.";
 
-  return (
-    <div style={{ background: "var(--lp-bg-paper)", color: "var(--lp-ink)" }}>
-      <Nav />
-      <main>
-        <Hero />
-        <TrustBar />
-        <Products />
-        <EthicsDeep />
-        <HowItWorks />
-        <DashboardPreview />
-        <Security />
-        <Pricing />
-        <FAQ />
-        <FinalCTA />
-      </main>
-      <Footer />
-    </div>
-  );
+  return {
+    title,
+    description,
+    keywords: data?.seo?.keywords ?? [
+      "etik ihbar",
+      "whistleblowing",
+      "KVKK",
+      "anonim ihbar",
+      "uyum",
+      "compliance",
+    ],
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      locale: "tr_TR",
+      siteName: "EthicAll",
+      ...(data?.seo?.ogImage
+        ? { images: [{ url: urlFor(data.seo.ogImage).width(1200).height(630).url() }] }
+        : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
+
+export default async function Home() {
+  let data: LandingPageData | null = null;
+  try {
+    data = await sanityFetch<LandingPageData>(landingPageQuery);
+  } catch {
+    /* fallback to hardcoded content in components */
+  }
+
+  return <LandingClient data={data} />;
 }

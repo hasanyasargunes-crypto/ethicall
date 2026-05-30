@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Reveal, SectionHead } from "./atoms";
+import type { LandingPageData } from "@/sanity/types";
 
-const QA = [
+const DEFAULT_QA = [
   [
     "İhbarcının kimliği gerçekten gizli mi kalıyor?",
     "Evet. Sistem; IP adresi, cihaz parmak izi veya konum gibi hiçbir tanımlayıcı veriyi toplamaz. İhbarcı kimliği teknik olarak dahi geri izlenemez. Anonimliği bozmadan çift yönlü iletişim kurulabilir.",
@@ -26,13 +27,16 @@ const QA = [
   ],
 ];
 
-export default function FAQ() {
+export default function FAQ({ data }: { data?: LandingPageData | null }) {
   const [open, setOpen] = useState(0);
+  const QA = data?.faqItems
+    ? data.faqItems.map((item) => [item.question, item.answer])
+    : DEFAULT_QA;
 
   return (
     <section style={{ padding: "110px 0 100px" }}>
       <div className="lp-container" style={{ maxWidth: 860 }}>
-        <SectionHead align="center" eyebrow="SSS" title="Sıkça sorulan sorular" maxw={560} />
+        <SectionHead align="center" eyebrow={data?.faqEyebrow ?? "SSS"} title={data?.faqTitle ?? "Sıkça sorulan sorular"} maxw={560} />
         <div style={{ marginTop: 44 }}>
           {QA.map(([q, a], i) => {
             const isOpen = open === i;

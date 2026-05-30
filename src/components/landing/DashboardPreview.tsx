@@ -2,6 +2,7 @@
 
 import { Reveal, SectionHead, Logo } from "./atoms";
 import { Icons } from "./icons";
+import type { LandingPageData } from "@/sanity/types";
 
 const CASES = [
   ["#4F2A1C", "Tedarikçi komisyon talebi", "Etik İhbar", "Açık", "high", "2 saat önce"],
@@ -33,15 +34,15 @@ const SIDEBAR_ITEMS: [React.ComponentType<{ size?: number }>, string, boolean][]
   [Icons.layers, "Ayarlar", false],
 ];
 
-export default function DashboardPreview() {
+export default function DashboardPreview({ data }: { data?: LandingPageData | null }) {
   return (
     <section style={{ padding: "110px 0 100px", overflow: "hidden" }}>
       <div className="lp-container">
         <SectionHead
           align="center"
-          eyebrow="Ürün önizlemesi"
-          title="Tüm vakalar, tek bir <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>komuta merkezinde</em>"
-          lede="Ekibiniz ihbarları, başvuruları ve tedarikçi risklerini aynı panelden yönetir. Net görünürlük, kanıtlanabilir süreç."
+          eyebrow={data?.dashEyebrow ?? "Ürün önizlemesi"}
+          title={data?.dashTitle ?? "Tüm vakalar, tek bir <em style='font-family:var(--font-display),serif;font-style:normal;color:var(--lp-green-700)'>komuta merkezinde</em>"}
+          lede={data?.dashSubtitle ?? "Ekibiniz ihbarları, başvuruları ve tedarikçi risklerini aynı panelden yönetir. Net görünürlük, kanıtlanabilir süreç."}
           maxw={680}
         />
         <Reveal delay={120} style={{ marginTop: 56, perspective: 1600 }}>
